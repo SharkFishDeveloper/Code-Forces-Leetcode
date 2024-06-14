@@ -5,22 +5,32 @@
   "exports": {
     "./button": "./src/button.tsx",
     "./card": "./src/card.tsx",
-    "./code": "./src/code.tsx"
+    "./code": "./src/code.tsx",
+    "./codeeditor": "./src/codeeditor.tsx",
+    "./codemirror": "./src/codemirror.tsx"
   },
   "scripts": {
     "lint": "eslint . --max-warnings 0",
     "generate:component": "turbo gen react-component"
   },
   "devDependencies": {
+    "@codemirror/lang-cpp": "^6.0.2",
+    "@monaco-editor/react": "^4.6.0",
     "@repo/eslint-config": "*",
     "@repo/typescript-config": "*",
     "@turbo/gen": "^1.12.4",
-    "@types/node": "^20.11.24",
     "@types/eslint": "^8.56.5",
+    "@types/node": "^20.11.24",
     "@types/react": "^18.2.61",
     "@types/react-dom": "^18.2.19",
+    "@uiw/react-codemirror": "^4.22.2",
+    "codemirror": "github:codemirror/basic-setup",
     "eslint": "^8.57.0",
-    "react": "^18.2.0",
+    "react": "^18.3.1",
     "typescript": "^5.3.3"
+  },
+  "dependencies": {
+    "@codemirror/basic-setup": "^0.20.0",
+    "@codemirror/lang-javascript": "^6.2.2"
   }
 }
