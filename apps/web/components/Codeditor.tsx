@@ -6,9 +6,12 @@ import React, { useEffect, useState } from 'react'
 interface CodeditorProps {
   code: string;
   setCode: React.Dispatch<React.SetStateAction<string>>;
+  setSelectedLanguage: React.Dispatch<React.SetStateAction<string>>;
 }
-const Codeditor:React.FC<CodeditorProps>  = ({code,setCode}) => {
-  const language_options = ["Java", "C", "C++", "Javascript", "Typescript", "Go", "Rust"];
+
+
+const Codeditor:React.FC<CodeditorProps>  = ({code,setCode,setSelectedLanguage}) => {
+  const language_options = ["Java", "C", "C++","Python", "Javascript", "Typescript", "Go", "Rust"];
   const [lang, setLang] = useState<string>("C++");
   const [box, setBox] = useState(false);
   const [mode, setMode] = useState("vs-dark");
@@ -53,6 +56,7 @@ const Codeditor:React.FC<CodeditorProps>  = ({code,setCode}) => {
                   onClick={() => {
                     setLang(option);
                     setBox(false);
+                    setSelectedLanguage(option);
                   }}
                 >
                   {option}

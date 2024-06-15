@@ -1,11 +1,15 @@
 "use client"
 import React, { useEffect, useState } from 'react'
 import Codeditor from '../../../components/Codeditor'
-import prettier from 'prettier';
-import { json } from 'stream/consumers';
+import redis from "redis"
+import { submitRed } from '../../lib/submit'
+
 
 const ContestRound = ({params}:{params:{id:string}}) => {
     const [code, setCode] = useState<string>(localStorage.getItem('userCode') || "");
+    const userId = "shahzeb012";
+    const [selectedLanguage, setSelectedLanguage] = useState<string>("C++");
+
 
     useEffect(()=>{
         const saveCode = ()=>{
@@ -19,6 +23,14 @@ const ContestRound = ({params}:{params:{id:string}}) => {
           };
     },[code]);
 
+    const handleSubmit = ()=>{
+        try {
+            submitRed({userId,code,selectedLanguage});
+            alert("Pushed in redis")
+        } catch (error) {
+            alert(error);
+        }
+    }
 
   return (
     <div className="">
@@ -36,11 +48,12 @@ const ContestRound = ({params}:{params:{id:string}}) => {
             <div className="font-semibold">Output</div>
             <p className="">5</p>
           </div>
+          <p>Selected Language: {selectedLanguage}</p>
         <p>{JSON.stringify(code) }</p>
         </div>
         <div className="flex-1">
-          <Codeditor code={code} setCode={setCode}/>
-          <div className="bg-black text-white h-[3rem] w-[5rem] flex justify-center items-center rounded-md hover:scale-105 hover:bg-gray-800 transition cursor-pointer" >Submit</div>
+          <Codeditor code={code} setCode={setCode} setSelectedLanguage={setSelectedLanguage}/>
+          <div className="bg-black text-white h-[3rem] w-[5rem] flex justify-center items-center rounded-md hover:scale-105 hover:bg-gray-800 transition cursor-pointer" onClick={handleSubmit}>Submit</div>
         </div>
       </div>
     </div>
