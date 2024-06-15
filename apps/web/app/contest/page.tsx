@@ -1,16 +1,26 @@
 
+import Link from 'next/link';
 import React from 'react'
-import Codeditor from '../../components/Codeditor'
+
 
 
 const Contest = () => {
+  const contests = [
+    {id:"12",cname:"Round1"}
+  ];
+
   return (
     <div>
         <div className="">
-       First  Contest Join now
+       {contests && contests.map((c,index)=> (
+        <div key={index}>
+
+          <Link href={`contest/${c.id}`}>{c.cname}</Link>
+        </div>
+       ))}
        </div>
         
-        <Codeditor/>
+        CLick on anyone to join
         
         </div>
   )

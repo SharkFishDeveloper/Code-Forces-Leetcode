@@ -4,7 +4,17 @@ import  { useRef } from "react";
 
 import Editor from "@monaco-editor/react";
 
-function CodeEditor({lang}:{lang:string}) {
+interface CodeEditorProps {
+  lang: string;
+  mode: string;
+  width: string;
+  code: string;
+  setCode: React.Dispatch<React.SetStateAction<string>>;
+}
+
+
+
+const CodeEditor:React.FC<CodeEditorProps> = ({lang,mode,width,code,setCode})=> {
   const editorRef = useRef(null);
 
   function handleEditorDidMount(editor, monaco) {
@@ -20,8 +30,10 @@ function CodeEditor({lang}:{lang:string}) {
       defaultValue=""
       language={lang}
       onMount={handleEditorDidMount}
-      theme="vs-dark"
-      width="50vw"
+      theme={mode}
+      width={width}
+      value={code}
+      onChange={(value) => setCode(value || "")}
     />
   );
 }
