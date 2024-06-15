@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react'
 import Codeditor from '../../../components/Codeditor'
 import redis from "redis"
 import { submitRed } from '../../lib/submit'
+import axios from 'axios'
 
 
 const ContestRound = ({params}:{params:{id:string}}) => {
@@ -23,9 +24,9 @@ const ContestRound = ({params}:{params:{id:string}}) => {
           };
     },[code]);
 
-    const handleSubmit = ()=>{
+    const handleSubmit = async()=>{
         try {
-            submitRed({userId,code,selectedLanguage});
+            const resp = await axios.post(`http://localhost:3000/api/submit_test`,{userId,code,selectedLanguage}) ;
             alert("Pushed in redis")
         } catch (error) {
             alert(error);
