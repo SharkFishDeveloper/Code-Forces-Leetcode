@@ -1,7 +1,6 @@
 "use client"
 import React, { useEffect, useState } from 'react'
 import Codeditor from '../../../components/Codeditor'
-import axios from 'axios'
 import { Submit } from '../../functions/submit'
 
 
@@ -28,8 +27,9 @@ const ContestRound = ({params}:{params:{id:string}}) => {
             // const resp = await axios.post(`/api/submit_test`,{userId,code,selectedLanguage}) ;
             // alert("Pushed in redis");
             // console.log("Pused consolet")
-            const resp = await Submit({userId,selectedLanguage,code});
-            alert(resp);
+            const Language = selectedLanguage.toLowerCase();
+            const resp = await Submit({userId,selectedLanguage:Language,code});
+            alert(resp.message);
             console.log(resp);
         } catch (error) {
             alert(error);
