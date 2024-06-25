@@ -3,10 +3,11 @@ import React, { useEffect, useState } from 'react'
 import Codeditor from '../../../components/Codeditor'
 import { Submit } from '../../functions/submit'
 import Loader from '../../../components/Loader'
-
+import { signIn, signOut, useSession } from 'next-auth/react'
 
 
 const ContestRound = ({params}:{params:{id:string}}) => {
+    const session = useSession();
     const [code, setCode] = useState<string>(localStorage?.getItem('userCode') || "");
     const userId = "shahzeb012";
     const [selectedLanguage, setSelectedLanguage] = useState<string>("C++");
@@ -47,7 +48,7 @@ const ContestRound = ({params}:{params:{id:string}}) => {
               retryCount++;
                await runAgainFx();
             }else if(retryCount >= maxRetries){
-              alert("Try again after some time :(")
+              alert("Try again after some time :( or try in different language")
               retryCount = 0;
                return ;
             }
@@ -63,6 +64,8 @@ const ContestRound = ({params}:{params:{id:string}}) => {
   return (
     <div className="">
          <div className="mb-4 text-center">
+          <button onClick={()=>signIn()}>Sign in</button>
+          {session && JSON.stringify(session.data)}
         <div className="text-lg font-bold">Contest Round</div>
         <p className="font-bold text-2xl">Welcome to round - {params.id}</p>
       </div>
