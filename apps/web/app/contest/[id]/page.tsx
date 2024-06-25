@@ -2,13 +2,18 @@
 import React, { useEffect, useState } from 'react'
 import Codeditor from '../../../components/Codeditor'
 import { Submit } from '../../functions/submit'
+import Loader from '../../../components/Loader'
+
 
 
 const ContestRound = ({params}:{params:{id:string}}) => {
-    const [code, setCode] = useState<string>(localStorage.getItem('userCode') || "");
+    const [code, setCode] = useState<string>(localStorage?.getItem('userCode') || "");
     const userId = "shahzeb012";
     const [selectedLanguage, setSelectedLanguage] = useState<string>("C++");
-
+    const [loading,setLoading] = useState(false);
+    const [runagain,setRunagain] = useState(false);
+    let retryCount = 1;
+    const maxRetries = 2;
 
     useEffect(()=>{
         const saveCode = ()=>{
@@ -22,17 +27,36 @@ const ContestRound = ({params}:{params:{id:string}}) => {
           };
     },[code]);
 
+    const runAgainFx = async()=>{
+      try {
+        console.log("In run again function")
+        await handleSubmit();
+      } catch (error) {
+        
+        console.log(error);
+      }
+    }
+
+
     const handleSubmit = async()=>{
+      setLoading(true);
         try {
-            // const resp = await axios.post(`/api/submit_test`,{userId,code,selectedLanguage}) ;
-            // alert("Pushed in redis");
-            // console.log("Pused consolet")
             const Language = selectedLanguage.toLowerCase();
             const resp = await Submit({userId,selectedLanguage:Language,code});
-            alert(resp.message);
+            if(resp?.result.run.signal === "SIGKILL" && retryCount < maxRetries){
+              retryCount++;
+               await runAgainFx();
+            }else if(retryCount >= maxRetries){
+              alert("Try again after some time :(")
+              retryCount = 0;
+               return ;
+            }
+            // alert(resp.message);
             console.log(resp);
         } catch (error) {
             alert(error);
+        }finally{
+          setLoading(false);
         }
     }
 
@@ -57,7 +81,7 @@ const ContestRound = ({params}:{params:{id:string}}) => {
         </div>
         <div className="flex-1">
           <Codeditor code={code} setCode={setCode} setSelectedLanguage={setSelectedLanguage}/>
-          <div className="bg-black text-white h-[3rem] w-[5rem] flex justify-center items-center rounded-md hover:scale-105 hover:bg-gray-800 transition cursor-pointer" onClick={handleSubmit}>Submit</div>
+          <div className="bg-black text-white h-[3rem] w-[5rem] flex justify-center items-center rounded-md hover:scale-105 hover:bg-gray-800 transition cursor-pointer" onClick={handleSubmit}>{loading ? <Loader/>:"Submit"}</div>
         </div>
       </div>
     </div>
