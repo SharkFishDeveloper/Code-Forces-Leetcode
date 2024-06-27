@@ -38,11 +38,10 @@ export class ProblemDefinitionParser{
         return match ? match[1]:"";
     }
     extractTypeAndValue(line:string):{ type: string, name:string }|null{
-        let regex = /^Output field: ((?:\w+)<[\w<>]+>) (\w+)$/;
+        let regex = /^Output field: ((?:\w+)<[\w<>]+>|[\w<>]+) (\w+)$/;
         if(line.startsWith("Input field:")){
-            regex =  /^Input field: ((?:\w+)<[\w<>]+>) (\w+)$/;
+            regex =  /^Input field: ((?:\w+)<[\w<>]+>|[\w<>]+) (\w+)$/;
         }
-        console.log(line);
         const match = line.match(regex);
         console.log(match,match ? `Type: ${match[1]}, Name: ${match[2]}` : "No match found");
         return match ? { type: match[1], name: match[2] } : null; 

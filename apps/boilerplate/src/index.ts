@@ -18,18 +18,15 @@ function generateBoilerPlate(problem:string){
     const javaCode = partialParser.functionJava();
     const pythonCode = partialParser.functionPython();
     const rustCode = partialParser.functionRust();
-    if(fs.existsSync(boilerplatepath)){
+    if(!fs.existsSync(boilerplatepath)){
         fs.mkdirSync(boilerplatepath,{recursive:true})
-        console.log("Path exists");
-    }else{
-        console.log("Path doenot exists");
     }
     fs.writeFileSync(path.join(boilerplatepath,"function.cpp"),cppCode);
     fs.writeFileSync(path.join(boilerplatepath,"function.js"),jsCode);
     fs.writeFileSync(path.join(boilerplatepath,"function.java"),javaCode);
     fs.writeFileSync(path.join(boilerplatepath,"function.py"),pythonCode);
     fs.writeFileSync(path.join(boilerplatepath,"function.rs"),rustCode);
-
+    console.log("Boilerplate code generated successfully!");
 }
 
 

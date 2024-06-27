@@ -7,6 +7,7 @@ import { signIn, signOut, useSession } from 'next-auth/react'
 
 
 const ContestRound = ({params}:{params:{id:string}}) => {
+    // const file = fs.readFile("../../../../problems/add2numbers/boilerplate/function.js","utf-8",(err,file)=>console.log(err));
     const session = useSession();
     const [code, setCode] = useState<string>(localStorage?.getItem('userCode') || "");
     const userId = "shahzeb012";
