@@ -7,6 +7,7 @@ const LandingPage = () => {
     <div><div>Landing page</div>
     
     <Link href={"/contest"}>Participate in Contest</Link>
+    <Link href={"/problems"}>Solve problems</Link>
     
     </div>
   )

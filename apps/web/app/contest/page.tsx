@@ -15,7 +15,7 @@ const Contest = () => {
        {contests && contests.map((c,index)=> (
         <div key={index}>
 
-          <Link href={`contest/${c.id}`}>{c.cname}</Link>
+          <Link href={`contest/${c.id}`} >{c.cname}</Link>
         </div>
        ))}
        </div>

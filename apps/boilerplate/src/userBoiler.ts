@@ -30,12 +30,12 @@ export class ProblemDefinitionParser{
 
     extractValue(line:string):(string){
         const match = line.match(/: "(.*)"$/);
-        console.log(match?match[1]:"");
+        // console.log(match?match[1]:"");
         return match ? match[1]:"";
     }
     extractword(line:string):string{
         const match = line.match(/: "(\w+)/);
-        console.log(match ? match[1]:"");
+        // console.log(match ? match[1]:"");
         return match ? match[1]:"";
     }
     extractTypeAndValue(line:string):{ type: string, name:string }|null{
@@ -44,32 +44,32 @@ export class ProblemDefinitionParser{
             regex =  /^Input field: ((?:\w+)<[\w<>]+>|[\w<>]+) (\w+)$/;
         }
         const match = line.match(regex);
-        console.log(match,match ? `Type: ${match[1]}, Name: ${match[2]}` : "No match found");
+        // console.log(match,match ? `Type: ${match[1]}, Name: ${match[2]}` : "No match found");
         return match ? { type: match[1], name: match[2] } : null; 
     }
 
     functionCpp(): string {
         const input = this.inputFields.map((input) => `${this.maptypetoCpp(input.type)} ${input.name}`).join(", ");
-        console.log(input);
+        // console.log(input);
         //this.outputFields[0].type
         return `${this.maptypetoCpp(this.outputFields[0].type)} ${this.functionName} (${input}) {\n    // Your code\n    return ${this.outputFields[0].name};\n}`;
     }
 
     functionJs(): string {
         const input = this.inputFields.map((input) => `${input.name}`).join(", ");
-        console.log(input);
+        // console.log(input);
         return `function ${this.functionName} (${input}) {\n    // Your code\n    return ${this.outputFields[0].name};\n}`;
     }
 
     functionJava(): string {
         const input = this.inputFields.map((input) => `${this.mapTypeToJava(input.type)} ${input.name}`).join(", ");
-        console.log(input);
+        // console.log(input);
         return `public static ${this.mapTypeToJava(this.outputFields[0].type)} ${this.functionName} (${input}) {\n    // Your code\n    return ${this.outputFields[0].name};\n}`;
     }
 
     functionPython(): string {
         const input = this.inputFields.map(input => `${input.name}`).join(", ");
-        console.log(input); // Assuming you're using console.log for debugging purposes
+        // console.log(input); // Assuming you're using console.log for debugging purposes
         
         const pythonCode = `
     def ${this.functionName}(${input}):
@@ -82,7 +82,7 @@ export class ProblemDefinitionParser{
 
     functionRust(): string {
         const input = this.inputFields.map((input) => `${input.name}: ${this.mapTypeToRust(input.type)}`).join(", ");
-        console.log(input);
+        // console.log(input);
         return `fn ${this.functionName}(${input}) -> ${this.mapTypeToRust(this.outputFields[0].type)} {\n    // Your code\n    ${this.outputFields[0].name}\n}`;
     }
     

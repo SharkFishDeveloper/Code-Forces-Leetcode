@@ -1,6 +1,4 @@
-def search(num1, target):
-        # Your code
-        return result
+###USER_CODE_HERE
 def main():
         
             result_1 = binarysearch([1,2,3,4,5,6], 4)

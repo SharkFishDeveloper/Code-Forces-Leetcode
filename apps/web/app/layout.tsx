@@ -27,7 +27,9 @@ export default function RootLayout({
         <body className={`${geistSans.variable} ${geistMono.variable}`} style={{padding:3}}>
           <Providers>
             
+        {/* <div className="h-[100%] w-[100%]"> */}
         {children}
+        {/* </div> */}
           </Providers>
       </body>
     </html>
