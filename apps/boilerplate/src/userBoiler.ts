@@ -1,3 +1,4 @@
+
 export class ProblemDefinitionParser{
     problemName:string="";
     functionName:string="";
@@ -67,16 +68,24 @@ export class ProblemDefinitionParser{
     }
 
     functionPython(): string {
-        const input = this.inputFields.map((input) => `${input.name}`).join(", ");
-        console.log(input);
-        return `def ${this.functionName} (${input}):\n    # Your code\n    return ${this.outputFields[0].name}`;
+        const input = this.inputFields.map(input => `${input.name}`).join(", ");
+        console.log(input); // Assuming you're using console.log for debugging purposes
+        
+        const pythonCode = `
+    def ${this.functionName}(${input}):
+        # Your code
+        return ${this.outputFields[0].name}
+    `;
+        return pythonCode.trim(); // Trim to remove any leading/trailing whitespace
     }
+    
 
     functionRust(): string {
-        const input = this.inputFields.map((input) => `${this.mapTypeToRust(input.type)}: ${input.name}`).join(", ");
+        const input = this.inputFields.map((input) => `${input.name}: ${this.mapTypeToRust(input.type)}`).join(", ");
         console.log(input);
-        return `fn ${this.functionName} (${input}) -> ${this.mapTypeToRust(this.outputFields[0].type)} {\n    // Your code\n    ${this.outputFields[0].name}\n}`;
+        return `fn ${this.functionName}(${input}) -> ${this.mapTypeToRust(this.outputFields[0].type)} {\n    // Your code\n    ${this.outputFields[0].name}\n}`;
     }
+    
 
     maptypetoCpp(input:string):string{
         switch(input){
@@ -126,9 +135,9 @@ export class ProblemDefinitionParser{
             case "list<bool>":
                 return "ArrayList<Boolean>";
             case "list<list<char>>":
-                return "ArrayList<ArrayList<Character>>";
+                return "char[][]";
             case "list<list<int>>":
-                return "ArrayList<ArrayList<Integer>>";
+                return "int[][]";
             case "list<list<float>>":
                 return "ArrayList<ArrayList<Float>>";
             default:
