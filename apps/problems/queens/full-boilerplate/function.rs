@@ -3,6 +3,6 @@ fn main() {
                 ###USER_CODE_HERE
                 
                 
-                let result1 = add([1,2,3]);
+                let result1 = queens([['Q','.','Q''.']]);
                 println!("{}", result1);
             }

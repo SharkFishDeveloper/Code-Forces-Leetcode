@@ -1,28 +1,32 @@
-// "use client"
-
+"use client"
 import React, { useEffect, useState } from 'react';
-import ReactMarkdown from 'react-markdown';
 import { getFile } from '../app/functions/getMdfile';
-import remarkGfm from 'remark-gfm'; 
-
+import MarkdownPreview from '@uiw/react-markdown-preview';
+import Pingingloader from './Pingingloader';
+import { useRouter } from 'next/navigation';
 
 const MarkdownProblem = ({ path }:{ path:string }) => {
-const markdownd = `# This is a Markdown heading
-
-Here is some paragraph text with *emphasis* and **strong emphasis**.
-
-You can also include [links](https://www.example.com) and inline code snippets using \`code\` tags.`;
+  const router = useRouter();
   const [markdown, setMarkdown] = useState('');
   const [error, setError] = useState('');
+  const [loading,setLoading] = useState(false);
 
   useEffect(()=>{
     async  function fetchFile (){
+      setLoading(true);
     try {
+      
+        setError("");
         const resp =await getFile(path);
+        // console.log("MD file",resp);
         setMarkdown(resp);
-    } catch (error) {
-        return alert("Cannot find mark down file !!")
-    };
+    } catch (error:any) {
+        setError(error);
+        console.log("Cannot find mark down file !!")
+        router.replace("/problems");
+    }finally{
+      setLoading(false);
+    }
    }
    fetchFile();
   },[])
@@ -30,17 +34,16 @@ You can also include [links](https://www.example.com) and inline code snippets u
 
   return (
     <div>
-      {error ? (
-        <div style={{ color: 'red' }}>{error}</div>
-      ) : (
-        <div className="prose prose-sm md:prose-lg lg:prose-xl mx-auto">
-        <ReactMarkdown >
-          {markdownd}
-        </ReactMarkdown>
+      {!loading ? (
+        <div className="prose lg:prose-xl dark:prose-gray dark:prose-h2:text-gray-200 dark:prose-h4:text-gray-200">
+        <MarkdownPreview source={markdown} style={{ padding: 16 }} />
       </div>
+      ):(
+        <Pingingloader/>
       )}
     </div>
   );
 };
 
 export default MarkdownProblem;
+

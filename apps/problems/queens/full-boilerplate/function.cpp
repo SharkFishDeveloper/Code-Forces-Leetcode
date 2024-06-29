@@ -7,7 +7,7 @@
          int main() {
         
             
-            int a1 = add([1,2,3]);
+            list<list<char>> a1 = queens([['Q','.','Q''.']]);
         cout<< a1<<endl;
         return 0;
     }

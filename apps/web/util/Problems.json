@@ -43,29 +43,45 @@
     "title": "sudoku",
     "path": "../../problems/sudoku",
     "level": "hard"
-  },{
+  },
+  {
     "title": "sudoku",
     "path": "../../problems/sudoku",
     "level": "hard"
-  },{
+  },
+  {
     "title": "sudoku",
     "path": "../../problems/sudoku",
     "level": "hard"
-  },{
+  },
+  {
     "title": "sudoku",
     "path": "../../problems/sudoku",
     "level": "hard"
-  },{
+  },
+  {
     "title": "sudoku",
     "path": "../../problems/sudoku",
     "level": "hard"
-  },{
+  },
+  {
     "title": "sudoku",
     "path": "../../problems/sudoku",
     "level": "hard"
-  },{
+  },
+  {
     "title": "sudoku",
     "path": "../../problems/sudoku",
+    "level": "hard"
+  },
+  {
+    "title": "divide",
+    "path": "../../problems/divide",
+    "level": "easy"
+  },
+  {
+    "title": "queens",
+    "path": "../../problems/queens",
     "level": "hard"
   }
 ]

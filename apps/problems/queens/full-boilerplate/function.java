@@ -2,7 +2,7 @@
             public class Main {
                 public static void main(String[] args) {
                     
-                        int result1 = add([1,2,3]);
+                        list<list<char>> result1 = queens([['Q','.','Q''.']]);
                         System.out.println(result1);
                 }
                 ###USER_CODE_HERE

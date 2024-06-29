@@ -131,9 +131,9 @@ export class ProblemDefinitionParser{
             case "list<float>":
                 return "float[]";
             case "list<string>":
-                return "ArrayList<String>";
+                return "List<String>";
             case "list<bool>":
-                return "ArrayList<Boolean>";
+                return "List<Boolean>";
             case "list<list<char>>":
                 return "char[][]";
             case "list<list<int>>":

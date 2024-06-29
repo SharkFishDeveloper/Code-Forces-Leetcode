@@ -24,6 +24,7 @@ function generateBoilerPlate(problem:string,difficulty:string){
                 if (ans.toLowerCase()==="y") {
                         fs.mkdirSync(path.join(__dirname, PROBLEM_PATH, problem), { recursive: true });
                         fs.writeFileSync(path.join(__dirname, PROBLEM_PATH, problem, 'Structure.md'), '');
+                        fs.writeFileSync(path.join(__dirname, PROBLEM_PATH, problem, 'Problem.md'), '');
                          console.log("File created, now fill Structure.md !!");
                         
                         rl.close();

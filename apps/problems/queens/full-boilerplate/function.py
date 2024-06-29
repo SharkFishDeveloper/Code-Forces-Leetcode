@@ -1,7 +1,7 @@
 ###USER_CODE_HERE
 def main():
         
-            result_1 = add([1,2,3])
+            result_1 = queens([['Q','.','Q''.']])
             print(result_1)
     
 if __name__ == "__main__":

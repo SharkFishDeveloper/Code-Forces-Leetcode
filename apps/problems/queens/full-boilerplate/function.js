@@ -1,7 +1,7 @@
 ###USER_CODE_HERE
     function main() {
         
-        const result1 = add([1,2,3]);
+        const result1 = queens([['Q','.','Q''.']]);
         console.log(result1);
     }
     
