@@ -1,8 +1,8 @@
 
-Problem name: "Binary search"
-Function name: "search"
+Problem name: "Binary search on an array"
+Function name: "binarysearch"
 Input structure:
-Input field: list<int> num1
+Input field: list<int> nums
 Input field: int target
 Output structure:
 Output field: int result

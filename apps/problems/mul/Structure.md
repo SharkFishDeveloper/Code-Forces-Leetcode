@@ -1,6 +1,6 @@
 
-Problem name: "Divide 2 numbers"
-Function name: "divide"
+Problem name: "Numltiply 2 numbers"
+Function name: "mul"
 Input structure:
 Input field: int num1
 Input field: int num2

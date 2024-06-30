@@ -42,17 +42,17 @@ function generateBoilerPlate(problem:string,difficulty:string){
 function processInputFiles(problem: string,difficulty:string,inputpath:string, boilerplatepath: string, fullBoilerplate: string) {
     const fileContent = fs.readFileSync(inputpath,'utf-8');
     //!added this
-    const data = fs.readFileSync(path.join(__dirname, '../../web/util/Problems.json'),"utf-8");
-    let problems:{title:string,path:string,level:string}[] = JSON.parse(data);
-    const existsProb = problems.some((problemQ:any)=>problemQ.title===problem);
-    if(!existsProb){
-        const difficultyLevel = difficulty === "e"?"easy":difficulty === "m"?"medium":difficulty === "h"?"hard":"u";
-        problems.push({title:problem,path:`../../problems/${problem}`,level:difficultyLevel});
-        fs.writeFileSync((path.join(__dirname, '../../web/util/Problems.json')), JSON.stringify(problems, null, 2));
-    }
+    // const data = fs.readFileSync(path.join(__dirname, '../../web/util/Problems.json'),"utf-8");
+    // let problems:{title:string,path:string,level:string}[] = JSON.parse(data);
+    // const existsProb = problems.some((problemQ:any)=>problemQ.title===problem);
+    // if(!existsProb){
+    //     const difficultyLevel = difficulty === "e"?"easy":difficulty === "m"?"medium":difficulty === "h"?"hard":"u";
+    //     problems.push({title:problem,path:`../../problems/${problem}`,level:difficultyLevel});
+    //     fs.writeFileSync((path.join(__dirname, '../../web/util/Problems.json')), JSON.stringify(problems, null, 2));
+    // }
     
-    console.log("data",problems);
-
+    // console.log("data",problems);
+    //!
     if(fileContent===""){
         return console.log("Empty structure.md file !!")
     }
@@ -74,6 +74,21 @@ function processInputFiles(problem: string,difficulty:string,inputpath:string, b
     console.log("Boilerplate code generated successfully!");
     const inputFields = partialParser.inputFields;
     const outputFields = partialParser.outputFields;
+
+//!
+    const data = fs.readFileSync(path.join(__dirname, '../../web/util/Problems.json'),"utf-8");
+    let problems:{title:string,path:string,level:string}[] = JSON.parse(data);
+    const existsProb = problems.some((problemQ:any)=>problemQ.title===problem);
+    if(!existsProb){
+        const difficultyLevel = difficulty === "e"?"easy":difficulty === "m"?"medium":difficulty === "h"?"hard":"u";
+        problems.push({title:problem,path:`../../problems/${problem}`,level:difficultyLevel});
+        fs.writeFileSync((path.join(__dirname, '../../web/util/Problems.json')), JSON.stringify(problems, null, 2));
+    }
+    
+    console.log("data",problems);
+
+//!
+
     const fullBoiler = new FullBoilerplate(cppCode,javaCode,problem,inputFields,outputFields);
 
     const fcppCode = fullBoiler.generateCpp();

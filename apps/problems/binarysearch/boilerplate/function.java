@@ -1,4 +1,4 @@
-public static int search (int[] num1, int target) {
+public static int binarysearch (int[] nums, int target) {
     // Your code
     return result;
 }

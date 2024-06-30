@@ -23,17 +23,23 @@ export class FullBoilerplate{
     parseTestCase(){
         const bplatePath = path.join(__dirname,PROBLEM_PATH,this.problem,"test_case");
         console.log(this.problem);
+        // console.log( path.join(__dirname,PROBLEM_PATH,this.problem,"test_case"))
+        // return;
         if(!fs.existsSync(path.join(bplatePath,"test.txt"))){
             console.log("Make test cases first !! Here I created files enjoy :)");
-            console.log("Test cases should be in one line !!")
+            console.log("Test cases should be in one line and after one line")
             fs.mkdirSync(bplatePath);
             fs.writeFileSync(path.join(bplatePath,"test.txt"),'');
             fs.writeFileSync(path.join(bplatePath,"sol.txt"),'');
             return ;
         }
+        const testPath = path.join(__dirname,PROBLEM_PATH,this.problem,"test_case","test.txt");
 
-        const file_content = fs.readFileSync(path.join(__dirname,PROBLEM_PATH,this.problem,"test_case","test.txt"),"utf-8");
+            const file_content = fs.readFileSync(testPath,"utf-8");
+        console.log("problem",path.join(__dirname,PROBLEM_PATH,this.problem,"test_case","test.txt"),"file_content");
+        // return ;
         const lines = file_content.trim().split('\n');
+
         lines.forEach((line)=>{
             const trimmedLine = line.trim();
             const values = trimmedLine.split(/\s+/)
@@ -44,10 +50,10 @@ export class FullBoilerplate{
                 this.testcases.push(values);
             }
         })
-        this.generateCpp();
-        console.log(this.testcases);
+        console.log("test cases ############",this.testcases);
         console.log(this.inputFields);
         console.log(this.outputFields)
+        this.generateCpp();
     }
 
 

@@ -1,4 +1,4 @@
-int search (vector<int> num1, int target) {
+int binarysearch (vector<int> nums, int target) {
     // Your code
     return result;
 }

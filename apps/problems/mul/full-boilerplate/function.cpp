@@ -7,8 +7,12 @@
          int main() {
         
             
-            list<list<char>> a1 = queens([['Q','.','Q''.']]);
+            int a1 = mul(12,100);
         cout<< a1<<endl;
+        
+            
+            int a2 = mul(100,56);
+        cout<< a2<<endl;
         return 0;
     }
         

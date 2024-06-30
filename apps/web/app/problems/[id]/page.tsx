@@ -1,11 +1,12 @@
 "use client"
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import MarkdownProblem from '../../../components/MarkdownProblem';
 import Codeditor from '../../../components/Codeditor';
 import { Submit } from '../../functions/submit';
 import Loader from '../../../components/Loader';
+import ShowTestCase from '../../../components/ShowTestCase';
 import { fetchBoilerPlateCode } from '../../functions/boilerplatecode';
 
 const Problem = ({ params }: { params: { id: string, title: string, path: string, level: string } }) => {
@@ -20,6 +21,15 @@ const Problem = ({ params }: { params: { id: string, title: string, path: string
     const [fullcode, setFullCode] = useState("");
     const [testcase, setTestcase] = useState("");
     const [output, setOutput] = useState("");
+    const [showtestcase,setShowtestcase] = useState(false);
+    const scrollRef = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        // Scroll to the element when showtestcase becomes true
+        if (showtestcase && scrollRef.current) {
+            scrollRef.current.scrollIntoView({ behavior: 'smooth' });
+        }
+    }, [showtestcase]);
 
     useEffect(() => {
         const saveCode = () => {
@@ -46,7 +56,9 @@ const Problem = ({ params }: { params: { id: string, title: string, path: string
     }
 
     const handleSubmit = async () => {
+        setShowtestcase(false);
         const final_user_code = fullcode.replace("###USER_CODE_HERE", code);
+        console.log("final_user_code",final_user_code)
         setLoading(true);
         try {
             const Language = selectedLanguage.toLowerCase();
@@ -91,27 +103,21 @@ const Problem = ({ params }: { params: { id: string, title: string, path: string
     }
 
     async function checkTestCases(outputs:string) {
-      const areEqual =compareStructuredData(testcase,outputs);
-      console.log("Are test cases and output equal?", output);
+      compareStructuredData(testcase,outputs);
+      setShowtestcase(true);
   }
 
   function compareStructuredData(a:any,b:any){
-    const cleanedB = b // Remove all spaces
-                     .replace(/,\s+/g, ',') // Remove spaces after commas
+    const cleanedB = b 
+                     .replace(/,\s+/g, ',')
                      .replace(/\[\s+/g, '[').replace(/\s+\]/g, ']')
-                     .replace(/'/g, '')     // Remove single quotes
+                     .replace(/'/g, '') 
                      .replace(undefined, ''); 
     setOutput(cleanedB);
 
     console.log("O->",cleanedB);
-//.replace(/"/g, '')
     setTestcase(a.replace(/"/g, ""));
     console.log("T->",a.replace(/"/g, "")) // Remove newlines
-    // .replace(/ /g, '')  // Remove spaces
-    // .replace(/'/g, '"'));
-    // console.log("Testcase->",a.split("\n").join("").replace(/ /g,"").replace(undefined,"").replace(/['"]/g, ''));
-    // const y =b.split("\n").join("").replace(/"/g, '').replace(/ /g, '');
-    // return {};
   } 
 
     
@@ -121,13 +127,16 @@ const Problem = ({ params }: { params: { id: string, title: string, path: string
     // console.log("Actual outputs ->", output)
 
     return (
-        <div className="flex flex-col lg:flex-row">
-            <div className="w-full lg:w-[50%] shadow-lg">
+        <div>
+            <div className="flex flex-col lg:flex-row">
+            <div className="w-full lg:w-[50%] ">
                 <MarkdownProblem path={`${path}/Problem.md`} />
             </div>
             {/* <div>Output - {output}</div>
             <div>Real test cases - {testcase}</div> */}
-            <div className="w-full lg:w-[50%] mt-4 lg:mt-0 lg:ml-4 shadow-lg">
+            <div className="w-full lg:w-[50%] mt-4 lg:mt-0 lg:ml-4">
+                
+                <Codeditor code={code} setCode={setCode} setSelectedLanguage={setSelectedLanguage} />
                 <div className="flex w-[14rem] h-[3rem]  rounded-md justify-center items-center space-x-3 text-sm ml-2">
                     <div
                         className="bg-black text-white w-[6rem] h-[2rem] flex justify-center items-center rounded-md  hover:bg-gray-800 hover:scale-105 transition cursor-pointer mt-4 lg:mt-0"
@@ -137,8 +146,11 @@ const Problem = ({ params }: { params: { id: string, title: string, path: string
                     </div>
                     <div className="bg-black w-[6rem] h-[2rem] text-white hover:bg-gray-800 rounded-md flex justify-center items-center hover:scale-105 transition cursor-pointer">Submissions</div>
                 </div>
-                <Codeditor code={code} setCode={setCode} setSelectedLanguage={setSelectedLanguage} />
+                <div ref={scrollRef}></div>
+
             </div>
+        </div>
+        {showtestcase && (<ShowTestCase output={output} testcase={testcase}/>)}
         </div>
     );
 }
