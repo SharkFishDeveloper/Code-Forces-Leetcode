@@ -63,6 +63,10 @@ const Problem = ({ params }: { params: { id: string, title: string, path: string
         try {
             const Language = selectedLanguage.toLowerCase();
             const resp = await Submit({ userId: "shahzeb012", selectedLanguage: Language, code: final_user_code });
+            if(resp?.status===300){
+                return alert(resp.message)
+            }
+            console.log("@@@@@@@@@@@",resp)
             if (resp?.result.run.signal === "SIGKILL" && retryCount < maxRetries) {
                 retryCount++;
                 await runAgainFx();
@@ -74,12 +78,11 @@ const Problem = ({ params }: { params: { id: string, title: string, path: string
               console.log("blkaf",resp?.result.run.output);
               setOutput(resp?.result.run.output);
             }
-            else{
-              alert("some error")
-            }
-            return await checkTestCases(resp?.result.run.output);
+            //return
+             await checkTestCases(resp?.result.run.output);
         } catch (error) {
-            alert(error);
+            console.log("over")
+            return alert(error);
         } finally {
             setLoading(false);
         }
@@ -108,7 +111,8 @@ const Problem = ({ params }: { params: { id: string, title: string, path: string
   }
 
   function compareStructuredData(a:any,b:any){
-    const cleanedB = b 
+    try {
+        const cleanedB = b 
                      .replace(/,\s+/g, ',')
                      .replace(/\[\s+/g, '[').replace(/\s+\]/g, ']')
                      .replace(/'/g, '') 
@@ -118,6 +122,10 @@ const Problem = ({ params }: { params: { id: string, title: string, path: string
     console.log("O->",cleanedB);
     setTestcase(a.replace(/"/g, ""));
     console.log("T->",a.replace(/"/g, "")) // Remove newlines
+    } catch (error) {
+        console.log(error);
+        return error;
+    }
   } 
 
     

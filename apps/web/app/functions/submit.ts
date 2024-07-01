@@ -1,6 +1,5 @@
 import axios from "axios";
-import { NextResponse } from "next/server";
-import { createClient } from "redis";
+import { getSession } from "next-auth/react";
 
 export interface submitReq {
     selectedLanguage:string,
@@ -8,19 +7,19 @@ export interface submitReq {
     userId:string
 }
 
-// const redis = createClient();
-
-// redis.on('error', (err) => console.log('Redis Client Error', err));
-
-// async function connectRedis() {
-//     await redis.connect();
-// }
-
-// connectRedis().catch(console.error);
 //@ts-ignore
 async function Submit({code,selectedLanguage,userId}) {
+    
+    const session = await getSession();
     try {
-        // const body = {submitReq.userId,submitReq.code,submitReq.selectedLanguage};
+
+        if (!session) {
+        // console.log("No session")
+        // alert("ERROR")
+            return {message:"Please login first",status:300,result:"error"}; 
+        // return Response.json({message:"Please login first"})
+        // res.status(401).json({ message: "Unauthorized. Please sign in." });
+    }
         const resp = await axios.post("http://localhost:4000/submit-code",{code,selectedLanguage,userId});
         return {
             message: "Code executed successfully",
@@ -30,7 +29,9 @@ async function Submit({code,selectedLanguage,userId}) {
         // await redis.hSet(submitReq.userId,{"code":submitReq.code,"language":submitReq.selectedLanguage}); 
 
     } catch (error) {
+        
         console.log(error);
+        return {message:"Submitting error",status:300,result:"error"}
     }
 }
 
