@@ -1,15 +1,16 @@
 
             public class Main {
                 public static void main(String[] args) {
-                    
-                        int result1 = add(1, 2);
-                        System.out.println(result1);
-                
-                        int result2 = add(3, 4);
-                        System.out.println(result2);
-                
-                        int result3 = add(4, 6);
-                        System.out.println(result3);
+                    int num11 = 1;
+int num21 = 3;
+int output1 = add(num11,num21);
+System.out.println(output1);
+ int num12 = 4;
+int num22 = 5;
+int output2 = add(num12,num22);
+System.out.println(output2);
+
+
                 }
                 ###USER_CODE_HERE
             }

@@ -52,26 +52,33 @@ export class ProblemDefinitionParser{
         const input = this.inputFields.map((input) => `${this.maptypetoCpp(input.type)} ${input.name}`).join(", ");
         // console.log(input);
         //this.outputFields[0].type
-        return `${this.maptypetoCpp(this.outputFields[0].type)} ${this.functionName} (${input}) {\n    // Your code\n    return ${this.outputFields[0].name};\n}`;
+        return `
+//Add imports here
+    ${this.maptypetoCpp(this.outputFields[0].type)} ${this.functionName} (${input}) {\n    // Your code\n    return ${this.outputFields[0].name};\n}`;
     }
 
     functionJs(): string {
         const input = this.inputFields.map((input) => `${input.name}`).join(", ");
         // console.log(input);
-        return `function ${this.functionName} (${input}) {\n    // Your code\n    return ${this.outputFields[0].name};\n}`;
+        return `
+//Add imports here
+    function ${this.functionName} (${input}) {\n    // Your code\n    return ${this.outputFields[0].name};\n}`;
     }
 
     functionJava(): string {
         const input = this.inputFields.map((input) => `${this.mapTypeToJava(input.type)} ${input.name}`).join(", ");
         // console.log(input);
-        return `public static ${this.mapTypeToJava(this.outputFields[0].type)} ${this.functionName} (${input}) {\n    // Your code\n    return ${this.outputFields[0].name};\n}`;
+        return `
+//Add imports here
+    public static ${this.mapTypeToJava(this.outputFields[0].type)} ${this.functionName}(${input}) {\n    // Your code\n    return ${this.outputFields[0].name};\n}`;
     }
 
     functionPython(): string {
         const input = this.inputFields.map(input => `${input.name}`).join(", ");
         // console.log(input); // Assuming you're using console.log for debugging purposes
-        
-        const pythonCode = `
+ 
+    const pythonCode = `
+//Add imports here 
     def ${this.functionName}(${input}):
         # Your code
         return ${this.outputFields[0].name}
@@ -103,6 +110,8 @@ export class ProblemDefinitionParser{
                 return "vector<float>";
             case "list<string>":
                 return "vector<string>";
+            case "list<list<string>>":
+                    return "vector<vector<string>>";
             case "list<bool>":
                 return "vector<bool>";
             case "list<list<char>>":
@@ -132,6 +141,8 @@ export class ProblemDefinitionParser{
                 return "float[]";
             case "list<string>":
                 return "List<String>";
+            case "list<list<string>>":
+                return "List<List<String>>";
             case "list<bool>":
                 return "List<Boolean>";
             case "list<list<char>>":
@@ -164,7 +175,9 @@ export class ProblemDefinitionParser{
             case "list<bool>":
                 return "List[bool]";
             case "list<list<char>>":
-                return "List[List[str]]";
+            return "List[List[str]]";
+            case "list<list<string>>":
+                    return "List[List[str]]";
             case "list<list<int>>":
                 return "List[List[int]]";
             case "list<list<float>>":
@@ -190,6 +203,8 @@ export class ProblemDefinitionParser{
                 return "Vec<f32>";
             case "list<string>":
                 return "Vec<String>";
+                case "list<list<string>>":
+                    return "Vec<Vec<String>>";
             case "list<bool>":
                 return "Vec<bool>";
             case "list<list<char>>":

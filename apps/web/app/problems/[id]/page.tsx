@@ -57,12 +57,26 @@ const Problem = ({ params }: { params: { id: string, title: string, path: string
 
     const handleSubmit = async () => {
         setShowtestcase(false);
-        const final_user_code = fullcode.replace("###USER_CODE_HERE", code);
+        let final_user_code="";
+        if(selectedLanguage==="Java"){
+            final_user_code = fullcode.replace("###USER_CODE_HERE", code);
+            const importRegex = /^(?!\s*\/\/.*)(\s*import\s+[^\n;]+;)/gm;
+            const imports = final_user_code.match(importRegex) || [];
+            const importsText = imports.join('\n').trim();
+            const finalCodeWithoutImports = final_user_code.replace(importRegex, '');
+            final_user_code = `${importsText}${finalCodeWithoutImports}`
+
+            console.log("%%%%",final_user_code)
+        }
+        else{
+             final_user_code = fullcode.replace("###USER_CODE_HERE", code);
+        }
         console.log("final_user_code",final_user_code)
         setLoading(true);
         try {
             const Language = selectedLanguage.toLowerCase();
             const resp = await Submit({ userId: "shahzeb012", selectedLanguage: Language, code: final_user_code });
+            console.log("!!!!!!!!!!!!@@@@@@@@",final_user_code)
             if(resp?.status===300){
                 return alert(resp.message)
             }
@@ -116,12 +130,14 @@ const Problem = ({ params }: { params: { id: string, title: string, path: string
                      .replace(/,\s+/g, ',')
                      .replace(/\[\s+/g, '[').replace(/\s+\]/g, ']')
                      .replace(/'/g, '') 
-                     .replace(undefined, ''); 
+                     .replace(undefined, '')
+                     .replace(/"/g, ''); //! i added this , remove this in case of incorrect output
     setOutput(cleanedB);
-
-    console.log("O->",cleanedB);
+    console.log("O->",b);
+    console.log("T->",a)
+    // console.log("O->",cleanedB);
     setTestcase(a.replace(/"/g, ""));
-    console.log("T->",a.replace(/"/g, "")) // Remove newlines
+    // console.log("T->",a.replace(/"/g, "")) // Remove newlines
     } catch (error) {
         console.log(error);
         return error;
@@ -137,7 +153,7 @@ const Problem = ({ params }: { params: { id: string, title: string, path: string
     return (
         <div>
             <div className="flex flex-col lg:flex-row">
-            <div className="w-full lg:w-[50%] ">
+            <div className="w-full lg:w-[50%] h-[100%] bg-black">
                 <MarkdownProblem path={`${path}/Problem.md`} />
             </div>
             {/* <div>Output - {output}</div>

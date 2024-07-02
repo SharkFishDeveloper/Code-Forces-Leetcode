@@ -11,7 +11,7 @@ interface CodeditorProps {
 
 
 const Codeditor:React.FC<CodeditorProps>  = ({code,setCode,setSelectedLanguage}) => {
-  const language_options = ["Java", "C++","Python", "Javascript", "Rust"];
+  const language_options = ["Java", "C++","Python", "Javascript"];
   const [lang, setLang] = useState<string>("C++");
   const [box, setBox] = useState(false);
   const [mode, setMode] = useState("vs-dark");

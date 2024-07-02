@@ -74,6 +74,7 @@ function processInputFiles(problem: string,difficulty:string,inputpath:string, b
     console.log("Boilerplate code generated successfully!");
     const inputFields = partialParser.inputFields;
     const outputFields = partialParser.outputFields;
+    const functionName = partialParser.functionName;
 
 //!
     const data = fs.readFileSync(path.join(__dirname, '../../web/util/Problems.json'),"utf-8");
@@ -85,14 +86,15 @@ function processInputFiles(problem: string,difficulty:string,inputpath:string, b
         fs.writeFileSync((path.join(__dirname, '../../web/util/Problems.json')), JSON.stringify(problems, null, 2));
     }
     
-    console.log("data",problems);
+    // console.log("data",problems);
 
 //!
 
-    const fullBoiler = new FullBoilerplate(cppCode,javaCode,problem,inputFields,outputFields);
+    const fullBoiler = new FullBoilerplate(cppCode,javaCode,problem,inputFields,outputFields,functionName);
 
     const fcppCode = fullBoiler.generateCpp();
     const fjavaCode = fullBoiler.generateJava();
+    console.log(fcppCode)
     const fpythonCode = fullBoiler.generatePython();
     const fjsCode = fullBoiler.generateJs();
     const frustCode = fullBoiler.generateRust();

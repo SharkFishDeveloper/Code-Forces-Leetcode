@@ -35,7 +35,7 @@ const MarkdownProblem = ({ path }:{ path:string }) => {
   return (
     <div>
       {!loading ? (
-        <div className="prose lg:prose-xl dark:prose-gray dark:prose-h2:text-gray-200 dark:prose-h4:text-gray-200">
+        <div className="prose lg:prose-xl dark:prose-gray dark:prose-h2:text-gray-200 dark:prose-h4:text-gray-200 ">
         <MarkdownPreview source={markdown} style={{ padding: 16 }} />
       </div>
       ):(

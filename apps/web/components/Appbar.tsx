@@ -27,11 +27,11 @@ const AppBar = () => {
 
       {/* Navigation Links */}
       <div className="flex space-x-4">
-        <Link href="/contest">
-          Contests
+        <Link href="/contest" >
+          <span className="font-semibold hover:text-gray-300">Contest</span>
         </Link>
         <Link href="/problems">
-          Problems
+        <span className="font-semibold hover:text-gray-300">Problems</span>
         </Link>
       </div>
 
