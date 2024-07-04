@@ -1,7 +1,6 @@
-
 "use client";
 import { useState } from 'react';
-import {  signOut, useSession } from 'next-auth/react';
+import { signOut, useSession } from 'next-auth/react';
 import Image from 'next/image';
 import Link from 'next/link';
 import userIcon from "../util/images/user.png";
@@ -26,18 +25,18 @@ const AppBar = () => {
       </div>
 
       {/* Navigation Links */}
-      <div className="flex space-x-4">
+      <div className="hidden md:flex space-x-4">
         <Link href="/contest" >
           <span className="font-semibold hover:text-gray-300">Contest</span>
         </Link>
         <Link href="/problems">
-        <span className="font-semibold hover:text-gray-300">Problems</span>
+          <span className="font-semibold hover:text-gray-300">Problems</span>
         </Link>
       </div>
 
       {/* Conditional Login Button */}
       {!session ? (
-        <div className="bg-gray-800 hover:bg-gray-700 text-white px-4 py-2 rounded-md" onClick={()=>router.replace("signin")}>
+        <div className="bg-gray-800 hover:bg-gray-700 text-white px-4 py-2 rounded-md cursor-pointer" onClick={()=>router.replace("signin")}>
           <Link href="/signin">Login</Link>
         </div>
       ) : (
@@ -49,14 +48,15 @@ const AppBar = () => {
             </div>
             {/* Profile Dropdown */}
             {openProfile && (
-              <div className="absolute right-0 mt-2 w-[15rem] bg-white text-black rounded-lg shadow-lg">
+              <div className="absolute right-0 mt-2 w-[15rem] bg-white text-black rounded-lg shadow-lg z-10">
                 <div className="flex items-center space-x-2 p-2">
                   <Image src={session.user?.image!} alt="User Icon" width={30} height={30} className="rounded-full" />
                   <div>
                     {session.user && (
                       <>
-                      <p className="font-semibold">{session.user.name}</p>
-                      <p className="text-xs text-gray-500">{session.user.email}</p></>
+                        <p className="font-semibold">{session.user.name}</p>
+                        <p className="text-xs text-gray-500">{session.user.email}</p>
+                      </>
                     )}
                   </div>
                 </div>
@@ -65,12 +65,20 @@ const AppBar = () => {
                 <button className="block w-full text-left px-4 py-2 text-sm text-gray-800 hover:bg-gray-100" onClick={handleSignOut}>
                   Logout
                 </button>
-
               </div>
             )}
           </div>
         </div>
       )}
+
+      {/* Mobile Navigation (Hamburger Menu) */}
+      <div className="md:hidden flex">
+        <button className="text-white focus:outline-none">
+          <svg className="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16m-7 6h7" />
+          </svg>
+        </button>
+      </div>
     </div>
   );
 };

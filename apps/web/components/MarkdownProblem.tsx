@@ -18,7 +18,7 @@ const MarkdownProblem = ({ path }:{ path:string }) => {
       
         setError("");
         const resp =await getFile(path);
-        // console.log("MD file",resp);
+        console.log("MD file ##########################",resp);
         setMarkdown(resp);
     } catch (error:any) {
         setError(error);
@@ -28,14 +28,15 @@ const MarkdownProblem = ({ path }:{ path:string }) => {
       setLoading(false);
     }
    }
-   fetchFile();
-  },[])
+  const fetchFILE =  async()=>await fetchFile();
+  fetchFILE();
+  },[path])
 
 
   return (
     <div>
       {!loading ? (
-        <div className="prose lg:prose-xl dark:prose-gray dark:prose-h2:text-gray-200 dark:prose-h4:text-gray-200 ">
+        <div className="prose lg:prose-xl dark:prose-gray dark:prose-h2:text-gray-200 dark:prose-h4:text-gray-200 h-[49.3rem]">
         <MarkdownPreview source={markdown} style={{ padding: 16 }} />
       </div>
       ):(

@@ -77,7 +77,7 @@ const Problem = ({ params }: { params: { id: string, title: string, path: string
             const Language = selectedLanguage.toLowerCase();
             const resp = await Submit({ userId: "shahzeb012", selectedLanguage: Language, code: final_user_code });
             console.log("!!!!!!!!!!!!@@@@@@@@",final_user_code)
-            if(resp?.status===300){
+            if(resp?.status===300 || resp?.status===429){
                 return alert(resp.message)
             }
             console.log("@@@@@@@@@@@",resp)
@@ -92,7 +92,6 @@ const Problem = ({ params }: { params: { id: string, title: string, path: string
               console.log("blkaf",resp?.result.run.output);
               setOutput(resp?.result.run.output);
             }
-            //return
              await checkTestCases(resp?.result.run.output);
         } catch (error) {
             console.log("over")
@@ -102,6 +101,8 @@ const Problem = ({ params }: { params: { id: string, title: string, path: string
         }
     }
 
+
+    
     const fetchBoilerPlate = async () => {
         try {
             const language = selectedLanguage === "C++" ? "cpp" :
@@ -124,6 +125,10 @@ const Problem = ({ params }: { params: { id: string, title: string, path: string
       setShowtestcase(true);
   }
 
+
+
+
+
   function compareStructuredData(a:any,b:any){
     try {
         const cleanedB = b 
@@ -143,12 +148,6 @@ const Problem = ({ params }: { params: { id: string, title: string, path: string
         return error;
     }
   } 
-
-    
-
-    // console.log("These are real sol. of test cases =>");
-    // console.log(testcase);
-    // console.log("Actual outputs ->", output)
 
     return (
         <div>

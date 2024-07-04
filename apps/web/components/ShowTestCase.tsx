@@ -3,9 +3,13 @@ import React, { useEffect, useState } from 'react';
 interface TestcaseInterface {
   output: string;
   testcase: string;
+  setProblemssolved?:(n:number)=>void,
+  problemssolved:number,
+  score:number,
+  setScore:(n:number)=>void
 }
 
-const ShowTestCase = ({ output, testcase }: TestcaseInterface) => {
+const ShowTestCase = ({ output, testcase, setProblemssolved, problemssolved,score,setScore }: TestcaseInterface) => {
   const [passedTestCase, setPassedTestCase] = useState(0);
   const [totalTestCase, setTotalTestCase] = useState(0);
   const [errortestcase,setErrortestcase] = useState<string|undefined>("");
@@ -59,6 +63,23 @@ const ShowTestCase = ({ output, testcase }: TestcaseInterface) => {
     compareLines(output, testcase);
   }, [output, testcase]);
 
+
+  useEffect(() => {
+    // if (passedTestCase === totalTestCase && setProblemssolved) {
+    //   setProblemssolved(problemssolved + 1); // Increment problemssolved by 1
+    // }
+    if (setScore && setProblemssolved) {
+      const percentPassed = Math.floor((passedTestCase / totalTestCase) * 100);
+      if (percentPassed > 0) {
+        //@ts-ignore
+        setProblemssolved( problemssolved + 1); // Increment problemssolved by 1
+        //@ts-ignore
+        setScore( percentPassed); // Increment score based on percent passed
+      }
+    }
+  },  [passedTestCase, totalTestCase, setProblemssolved, setScore]);
+
+
   return (
     <div className="flex items-center justify-center min-h-[50%] bg-white p-4 text-white">
   <div className="w-full max-w-4xl bg-black shadow-md rounded-md p-4 flex flex-col lg:flex-row">
@@ -105,7 +126,7 @@ const ShowTestCase = ({ output, testcase }: TestcaseInterface) => {
       
       <div className="flex items-center justify-center mt-4">
         <div className="font-bold mr-2">{passedTestCase}/{totalTestCase} Test Cases Passed</div>
-        {passedTestCase === totalTestCase ? (
+        {passedTestCase === totalTestCase  ? (
           <span className="text-green-400">✔️</span>
         ) : (
           <span className="text-red-400">❌</span>
@@ -114,11 +135,6 @@ const ShowTestCase = ({ output, testcase }: TestcaseInterface) => {
     </div>
   </div>
 </div>
-
-
-
-  
-
   );
 };
 

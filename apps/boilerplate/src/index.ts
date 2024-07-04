@@ -124,6 +124,7 @@ rl.question('Please enter the name of the problem file or type cts: ', (problemF
                 if(sol.toLowerCase()==="y"){
                 const probData = fs.readFileSync(path.join(__dirname, '../../web/util/Problems.json'),"utf-8");
                 let problemsData:{title:string,path:string,level:string}[] = JSON.parse(probData);
+            
                 rl.question("Enter all problems followed by level like a:level,b:level ",(problem)=>{
                 const problems = problem.split(",")
 
@@ -139,44 +140,99 @@ rl.question('Please enter the name of the problem file or type cts: ', (problemF
                 });
                 const problemDs:{title:string,path:string,level:string,score:string,date:Date}[]=[];
                 let allProblemsExist = keys.every(prob => {
-                    let probExists = problemsData.find(p => p.title === prob.trim());
+                    let probExists = problemsData.some(p => p.title === prob.trim());
                     if (!probExists) {
                         console.log(`The problem does not exist - ${prob}`);
                         return ;
                     }
-                    return true;
                 });
 
-                if(allProblemsExist){
-                    keys.forEach((prob,index)=>{
-                        let probExists = problemsData.find((p)=>p.title===prob.trim());
-                        if(!probExists){
-                            return console.log(`The problem does not exist - ${prob}`);
-                        }else{
-                            problemDs.push({
-                                title: probExists.title,
-                                path: probExists.path,
-                                level: probExists.level,
-                                score: values[index].toString(),
-                                date: new Date()
-                            });
+                if(!allProblemsExist){
+                    let dateQ:Date;
+                    rl.question("When should this contest happen (YYYY-MM-DD HH:MM)? ", (input) => {
+                         dateQ = new Date(input);
+                         if (isNaN(dateQ.getTime())) {
+                            console.log("Invalid date format. Please enter the date in YYYY-MM-DD HH:MM format.");
+                            
+                            return; 
                         }
+                        dateQ.setHours(dateQ.getHours() + 5);
+                            dateQ.setMinutes(dateQ.getMinutes() + 30);
+
+
+                        const problemDs:{title:string,path:string,level:string,score:string,date:Date}[] = [];
+                        keys.forEach((prob,index)=>{
+                            let probds:{title:string,path:string,level:string,score:string,date:Date}={title:'',level:'',path:'',date:new Date,score:''}; 
+                            let probExists = problemsData.find((p)=>p.title===prob.trim());
+                            if(!probExists){
+                                return console.log(`The problem does not exist over- ${prob}`);
+                            }else {
+                                // return console.log("Hey")
+                                // rl.question("When should this contest happen (YYYY-MM-DD HH:MM)? ", (input) => {
+                                    
+                                    
+                                   
+                                    
+                                    probds.title = probExists.title;
+                                    probds.level = probExists.level;
+                                    probds.path = probExists.path;
+                                    probds.score = values[index].toString();
+                                    probds.date = dateQ;
+    
+                                    problemDs.push(probds);
+                                    // problemDs.push({
+                                    //     title: probExists.title,
+                                    //     path: probExists.path,
+                                    //     level: probExists.level,
+                                    //     score: values[index].toString(),
+                                    //     date: date
+                                    // });
+                                    console.log(probds)
+    
+                                    // a.push({contest:id,problems:problemDs})
+                                    // console.log();
+                                    // if(problemDs.length!==0){
+                                    //     fs.writeFileSync((path.join(__dirname, '../../web/util/Contests.json')), JSON.stringify(a, null, 2));  
+                                    //      console.log("Created contest problems");
+                                    // }
+                                    // console.log("Problem details with date:", problemDs);
+                                
+                                // });
+                               
+                            }
+                            
+                                  
+                                
+                           
+                            
+                        })
+
+
+
+                        a.push({contest:id,problems:problemDs})
+                        if(problemDs.length!==0){
+                            fs.writeFileSync((path.join(__dirname, '../../web/util/Contests.json')), JSON.stringify(a, null, 2));  
+                             console.log("Created contest problems");
+                        }
+                        console.log("Problem details with date:", problemDs);
+
+
+                       
                     })
+      
+                  
                 }
 
-                a.push({contest:id,problems:problemDs})
-                // try {
-                   
-                // } catch (error) {
-                //     console.log(error)
-                // }
-                //  console.log(JSON.stringify(a));
-                if(problemDs.length!==0){
-                    fs.writeFileSync((path.join(__dirname, '../../web/util/Contests.json')), JSON.stringify(a, null, 2));  
-                }
-                 return console.log("Created contest problems");
-                        })
-                    }
+
+
+               
+
+
+
+
+               
+        })
+    }
                     else if(sol.toLowerCase()==="n"){
                         console.log("No contest created ")
                     }

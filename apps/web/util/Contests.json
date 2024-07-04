@@ -36,5 +36,209 @@
         "date": "2024-07-03T10:01:54.257Z"
       }
     ]
+  },
+  {
+    "contest": "60",
+    "problems": [
+      {
+        "title": "add",
+        "path": "../../problems/add",
+        "level": "easy",
+        "score": "50",
+        "date": "2024-07-04T00:37:56.149Z"
+      },
+      {
+        "title": "mul",
+        "path": "../../problems/mul",
+        "level": "easy",
+        "score": "100",
+        "date": "2024-07-04T00:37:56.152Z"
+      }
+    ]
+  },
+  {
+    "contest": "34",
+    "problems": [
+      {
+        "title": "add",
+        "path": "../../problems/add",
+        "level": "easy",
+        "score": "10",
+        "date": "2024-07-04T00:38:28.167Z"
+      },
+      {
+        "title": "mul",
+        "path": "../../problems/mul",
+        "level": "easy",
+        "score": "80",
+        "date": "2024-07-04T00:38:28.174Z"
+      }
+    ]
+  },
+  {
+    "contest": "19",
+    "problems": [
+      {
+        "title": "add",
+        "path": "../../problems/add",
+        "level": "easy",
+        "score": "100",
+        "date": "2024-07-04T00:41:23.349Z"
+      }
+    ]
+  },
+  {
+    "contest": "20",
+    "problems": [
+      {
+        "title": "mul",
+        "path": "../../problems/mul",
+        "level": "easy",
+        "score": "100",
+        "date": "2024-07-04T00:41:59.607Z"
+      }
+    ]
+  },
+  {
+    "contest": "21",
+    "problems": [
+      {
+        "title": "mul",
+        "path": "../../problems/mul",
+        "level": "easy",
+        "score": "800",
+        "date": "2024-07-04T00:42:44.254Z"
+      }
+    ]
+  },
+  {
+    "contest": "23",
+    "problems": [
+      {
+        "title": "mul",
+        "path": "../../problems/mul",
+        "level": "easy",
+        "score": "200",
+        "date": "2024-07-04T00:43:34.414Z"
+      }
+    ]
+  },
+  {
+    "contest": "12",
+    "problems": [
+      {
+        "title": "add",
+        "path": "../../problems/add",
+        "level": "easy",
+        "score": "199",
+        "date": "2024-07-04T00:45:19.356Z"
+      }
+    ]
+  },
+  {
+    "contest": "870",
+    "problems": [
+      {
+        "title": "add",
+        "level": "easy",
+        "path": "../../problems/add",
+        "date": "2024-07-04T00:53:50.392Z",
+        "score": "100"
+      },
+      {
+        "title": "mul",
+        "level": "easy",
+        "path": "../../problems/mul",
+        "date": "2024-07-04T00:53:50.398Z",
+        "score": "007"
+      }
+    ]
+  },
+  {
+    "contest": "891",
+    "problems": [
+      {
+        "title": "add",
+        "level": "easy",
+        "path": "../../problems/add",
+        "date": "2024-07-04T00:55:08.326Z",
+        "score": "100"
+      },
+      {
+        "title": "mul",
+        "level": "easy",
+        "path": "../../problems/mul",
+        "date": "2024-07-04T00:55:08.330Z",
+        "score": "55"
+      }
+    ]
+  },
+  {
+    "contest": "1000",
+    "problems": [
+      {
+        "title": "add",
+        "level": "easy",
+        "path": "../../problems/add",
+        "date": "2024-07-04T00:56:48.188Z",
+        "score": "1000"
+      },
+      {
+        "title": "mul",
+        "level": "easy",
+        "path": "../../problems/mul",
+        "date": "2024-07-04T00:56:48.192Z",
+        "score": "200"
+      }
+    ]
+  },
+  {
+    "contest": "210",
+    "problems": [
+      {
+        "title": "add",
+        "level": "easy",
+        "path": "../../problems/add",
+        "score": "100"
+      }
+    ]
+  },
+  {
+    "contest": "998",
+    "problems": [
+      {
+        "title": "add",
+        "level": "easy",
+        "path": "../../problems/add",
+        "date": "2024-07-04T13:00:00.000Z",
+        "score": "100"
+      },
+      {
+        "title": "mul",
+        "level": "easy",
+        "path": "../../problems/mul",
+        "date": "2024-07-04T13:00:00.000Z",
+        "score": "40"
+      }
+    ]
+  },
+  {
+    "contest": "2000",
+    "problems": [
+      {
+        "title": "add",
+        "level": "easy",
+        "path": "../../problems/add",
+        "date": "2024-07-04T17:50:00.000Z",
+        "score": "100"
+      },
+      {
+        "title": "mul",
+        "level": "easy",
+        "path": "../../problems/mul",
+        "date": "2024-07-04T17:50:00.000Z",
+        "score": "670"
+      }
+    ]
   }
 ]
