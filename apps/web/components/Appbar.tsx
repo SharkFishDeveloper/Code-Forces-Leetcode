@@ -32,6 +32,11 @@ const AppBar = () => {
         <Link href="/problems">
           <span className="font-semibold hover:text-gray-300">Problems</span>
         </Link>
+       {session?.user && (
+         <Link href={`/leaderboard/${session?.user.id}`} >
+         <span className="font-semibold hover:text-gray-300">Leaderboard</span>
+       </Link>
+       )}
       </div>
 
       {/* Conditional Login Button */}

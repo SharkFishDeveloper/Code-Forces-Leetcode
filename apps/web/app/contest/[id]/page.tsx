@@ -9,6 +9,7 @@ import MarkdownProblem from '../../../components/MarkdownProblem'
 import ShowTestCase from '../../../components/ShowTestCase'
 import Timer from '../../../components/Timer'
 import contestProblem from '../../functions/contestsubmit'
+import { useRouter } from 'next/navigation'
 
 
 
@@ -28,7 +29,7 @@ interface ContestData {
 
 
 const ContestRound = ({params}:{params:{id:string}}) => {
-
+  const router = useRouter();
   const [problemssolved,setProblemssolved] = useState(0);
   const [score,setScore] = useState(0);
   const { data: session } = useSession();
@@ -231,7 +232,13 @@ async function onFinishTimer (){
   });
   const contestUserObj = {contest:contest,solvedProblems,allproblems,score:userproblemsScore,user:session?.user.id,time:currentTimeLeft,username:session?.user?.name};
 
-  await contestProblem(contestUserObj);
+  try {
+    await contestProblem(contestUserObj)
+    alert("Thank you for participating")
+    router.replace("/");
+  } catch (error) {
+    alert("Some issue with submitting")
+  };
 
 
   return console.log("You clicked me",contestUserObj)
