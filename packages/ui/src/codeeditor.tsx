@@ -33,7 +33,7 @@ const CodeEditor:React.FC<CodeEditorProps> = ({lang,mode,width,code,setCode})=> 
       theme={mode}
       width={width}
       value={code}
-      onChange={(value) => setCode(value || "")}
+      onChange={(val) => setCode(val || "")}
     />
   );
 }

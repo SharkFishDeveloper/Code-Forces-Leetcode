@@ -3,9 +3,10 @@ import LandingPage from "../screens/LandingPage";
 
 export default function Home() {
   return (
-    <div>
+    <div className="h-[100vh] w-[100vw]">
+
+      
       <LandingPage/>
-      <p className="text-white">Somte</p>
     </div>
   );
 }
