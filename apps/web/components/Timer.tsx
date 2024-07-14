@@ -41,6 +41,7 @@ const Timer: React.FC<TimerProps> = ({ initialTime, onFinish, onTick }) => {
     <div className="h-[2rem] w-[10rem] text-white bg-gray-800 text-md rounded-md flex items-center justify-center hover:scale-105 transition-all hover:bg-gray-600">
       <span>Time left - {formatTime(timeLeft)}</span>
     </div>
+    // <div>saf</div>
   );
 };
 

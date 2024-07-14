@@ -7,6 +7,7 @@ export class FullBoilerplate{
     javaCode:string="";
     problem:string="";
     testcases:any[] = [];
+    testcases_ans:any[] = [];
     inputFields:{type:string,name:string}[] = [];
     outputFields:{type:string,name:string}[] = [];
     functionName:string="";
@@ -36,13 +37,19 @@ export class FullBoilerplate{
             return ;
         }
         const testPath = path.join(__dirname,PROBLEM_PATH,this.problem,"test_case","test.txt");
+        const ansPath = path.join(__dirname,PROBLEM_PATH,this.problem,"test_case","sol.txt");
 
             const file_content = fs.readFileSync(testPath,"utf-8");
         console.log("problem",path.join(__dirname,PROBLEM_PATH,this.problem,"test_case","test.txt"),"file_content");
-        // return ;
-        const lines = file_content.trim().split('\n');
 
-        lines.forEach((line)=>{
+        
+        const file_content_testans = fs.readFileSync(ansPath,"utf-8");
+        console.log("problem",path.join(__dirname,PROBLEM_PATH,this.problem,"test_case","sol.txt"),"file_content_ans");
+        // return ;
+        const lines_test = file_content.trim().split('\n');
+        const lines_ans = file_content_testans.trim().split('\n');
+
+        lines_test.forEach((line)=>{
             const trimmedLine = line.trim();
             const values = trimmedLine.split(/\s+/)
             if(trimmedLine!==''){
@@ -52,7 +59,19 @@ export class FullBoilerplate{
                 this.testcases.push(values);
             }
         })
+
+        lines_ans.forEach((line)=>{
+          const trimmedLine = line.trim();
+          const values = trimmedLine.split(/\s+/)
+          if(trimmedLine!==''){
+              const transformedValues = values.map((item)=>{
+                  console.log(item);
+              })
+              this.testcases_ans.push(values);
+          }
+      })
         console.log("test cases ############",this.testcases);
+        console.log("test cases ############",this.testcases_ans);
         console.log(this.inputFields);
         console.log(this.outputFields)
         this.generateCpp();

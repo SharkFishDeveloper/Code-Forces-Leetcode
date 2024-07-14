@@ -1,9 +1,10 @@
 import React from 'react'
-import { useRouter } from 'next/navigation';
+// import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 
-const ProblemCard = ({title,path,level,index}:{title:string,path:string,level:string,index:string}) => { 
-  const router = useRouter()
+// const ProblemCard = ({title,path,level,index}:{title:string,path:string,level:string,index:string}) =>
+const ProblemCard = ({title,level,index}:{title:string,level:string,index:string}) =>
+   { 
   const formattedTitle = title.charAt(0).toUpperCase() + title.slice(1);
   const formattedLevel = level.charAt(0).toUpperCase() + level.slice(1);
   return (
@@ -13,10 +14,10 @@ const ProblemCard = ({title,path,level,index}:{title:string,path:string,level:st
       <div className="h-8 w-32 bg-blue-500 hover:bg-blue-700 text-white flex justify-center items-center rounded-md cursor-pointer mt-4 transition-colors duration-300" 
       //onClick={()=>router.push(`/problems/${index}`,{scroll:false})}
        >
-        <Link href={{pathname:`/problems/${index}`,query:{
-          title,
-          path,
-          level
+        <Link href={{pathname:`/problems/${title}`,query:{
+          // title,
+          // path,
+          // level
         }}}>View problem</Link>
       </div>
     </div>

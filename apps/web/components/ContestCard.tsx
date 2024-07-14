@@ -17,6 +17,7 @@ interface ContestProps {
 
 
 const ContestCard= ({ name, problems }:ContestProps) => {
+    //@ts-ignore
     const date = new Date(problems[0]?.date);
     const formattedDate = date.toLocaleString('en-US', {
         weekday: 'short',

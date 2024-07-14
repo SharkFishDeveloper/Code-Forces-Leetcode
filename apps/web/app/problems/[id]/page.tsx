@@ -1,51 +1,114 @@
 "use client"
 
 import React, { useEffect, useRef, useState } from 'react';
-import { useSearchParams } from 'next/navigation';
 import MarkdownProblem from '../../../components/MarkdownProblem';
 import Codeditor from '../../../components/Codeditor';
 import { Submit } from '../../functions/submit';
 import Loader from '../../../components/Loader';
 import ShowTestCase from '../../../components/ShowTestCase';
-import { fetchBoilerPlateCode } from '../../functions/boilerplatecode';
+import Submissions from '../../../components/Submissions';
+import axios from 'axios';
+import FRONTEND_URL from '../../functions/frontendurl';
+
 
 const Problem = ({ params }: { params: { id: string, title: string, path: string, level: string } }) => {
-    const searchParams = useSearchParams();
     let retryCount = 1;
     const maxRetries = 2;
-
-    const path = searchParams.get('path');
     const [code, setCode] = useState<string>("");
     const [selectedLanguage, setSelectedLanguage] = useState<string>("C++");
     const [loading, setLoading] = useState(false);
     const [fullcode, setFullCode] = useState("");
     const [testcase, setTestcase] = useState("");
+    const [testcaseans,setTest_case_ans] = useState("");
     const [output, setOutput] = useState("");
     const [showtestcase,setShowtestcase] = useState(false);
+    const [showMd,setShowmd] = useState<string|null>("");
     const scrollRef = useRef<HTMLDivElement>(null);
+    const [submission,showSubmission] = useState(false);
+    const [submitButton,showSubmitButton] = useState(true);
+
+    // useEffect(() => {
+    //     const saveCode = () => {
+    //         localStorage.setItem("userCode", code);
+    //     }
+    //     const interval = setInterval(() => {
+    //         saveCode();
+    //     }, 8000);
+    //     return () => {
+    //         clearInterval(interval); // Cleanup on unmount
+    //     };
+    // }, [selectedLanguage]);
+
 
     useEffect(() => {
-        // Scroll to the element when showtestcase becomes true
         if (showtestcase && scrollRef.current) {
             scrollRef.current.scrollIntoView({ behavior: 'smooth' });
         }
     }, [showtestcase]);
 
-    useEffect(() => {
-        const saveCode = () => {
-            localStorage.setItem("userCode", code);
+
+
+    useEffect(()=>{
+        setLoading(true);
+        const findMd = async()=>{
+           try {
+            const resp = await axios.post(`${FRONTEND_URL}/api/problems`,{slug:params.id});
+            setShowmd(resp.data.message.description);
+            setCode(resp.data.message.boilerplatehalfcode);
+            setFullCode(resp.data.message.boilerplatefullcode);
+            let test = JSON.parse(resp.data.message.test_cases);
+            setTestcase(test);
+            setTest_case_ans(resp.data.message.test_cases_ans);
+
+           } catch (error) {
+            console.log(error);
+            return alert("Something bad happened");
+           }finally{
+            setLoading(false);
+           }
         }
-        const interval = setInterval(() => {
-            saveCode();
-        }, 8000);
+        findMd();
+        console.log("I ran");
+        console.log(selectedLanguage);
+        
+    },[selectedLanguage]);
 
-        fetchBoilerPlate();
-
-        return () => {
-            clearInterval(interval); // Cleanup on unmount
-        };
-    }, [selectedLanguage]);
-
+     
+    useEffect(()=>{
+        setLoading(true);
+        const fetchBoilerPlate = async () => {
+            try {
+                const language = selectedLanguage === "C++" ? "cpp" :
+                    selectedLanguage === "Java" ? "java" :
+                    selectedLanguage === "Python" ? "py" :
+                    selectedLanguage === "Javascript" ? "js" :
+                    selectedLanguage === "Rust" ? "rs" :
+                    "";
+                    if(language==="cpp"){
+                        return ;
+                    }
+                    console.log(language)
+                    try {
+                    const resp = await axios.post(`${FRONTEND_URL}/api/problems-boilerplate`,{slug:params.id,language:language});
+                    console.log("afsfsf",resp.data.message.boilerplateHalf);
+                    setCode(resp.data.message.boilerplateHalf);
+                    setFullCode(resp.data.message.boilerplateFull);
+                    } catch (error) {
+                    return alert("Error in fetching boilerlplate");
+                    }
+                    } catch (error) {
+                        alert("An error occurred");
+                    }
+                    finally{
+                        setLoading(false);
+                    }
+             }
+             fetchBoilerPlate();
+       },[selectedLanguage])
+    
+    console.log("####",testcaseans)
+    
+    
     const runAgainFx = async () => {
         try {
             console.log("In run again function");
@@ -54,7 +117,7 @@ const Problem = ({ params }: { params: { id: string, title: string, path: string
             console.log(error);
         }
     }
-
+//! do something here
     const handleSubmit = async () => {
         setShowtestcase(false);
         let final_user_code="";
@@ -75,7 +138,7 @@ const Problem = ({ params }: { params: { id: string, title: string, path: string
         setLoading(true);
         try {
             const Language = selectedLanguage.toLowerCase();
-            const resp = await Submit({ userId: "shahzeb012", selectedLanguage: Language, code: final_user_code });
+            const resp = await Submit({ selectedLanguage: Language, code: final_user_code });
             console.log("!!!!!!!!!!!!@@@@@@@@",final_user_code)
             if(resp?.status===300 || resp?.status===429){
                 return alert(resp.message)
@@ -89,7 +152,7 @@ const Problem = ({ params }: { params: { id: string, title: string, path: string
                 retryCount = 0;
                 return;
             } else if (resp?.result.run.output!==undefined) {
-              console.log("blkaf",resp?.result.run.output);
+            //   console.log("blkaf",resp?.result.run.output);
               setOutput(resp?.result.run.output);
             }
              await checkTestCases(resp?.result.run.output);
@@ -102,78 +165,93 @@ const Problem = ({ params }: { params: { id: string, title: string, path: string
     }
 
 
-    
-    const fetchBoilerPlate = async () => {
-        try {
-            const language = selectedLanguage === "C++" ? "cpp" :
-                selectedLanguage === "Java" ? "java" :
-                selectedLanguage === "Python" ? "py" :
-                selectedLanguage === "Javascript" ? "js" :
-                selectedLanguage === "Rust" ? "rs" :
-                "";
-            const bpCode = await fetchBoilerPlateCode(`${path}/boilerplate/function.${language}` as string);
-            setCode(bpCode.code);
-            setFullCode(bpCode.fullcode);
-            setTestcase(bpCode.test_case_code);
-        } catch (error) {
-            alert("An error occurred");
-        }
-    }
 
     async function checkTestCases(outputs:string) {
-      compareStructuredData(testcase,outputs);
+      compareStructuredData(testcaseans,outputs);
       setShowtestcase(true);
-  }
-
-
-
-
+    }
+     
+    console.log("REaL testcase",testcase);
 
   function compareStructuredData(a:any,b:any){
-    try {
-        const cleanedB = b 
+    //  console.log("O real->",b);
+    // console.log("Testcase real->",a.flat().join('\n'))
+    const cleanedB = b 
                      .replace(/,\s+/g, ',')
                      .replace(/\[\s+/g, '[').replace(/\s+\]/g, ']')
                      .replace(/'/g, '') 
                      .replace(undefined, '')
                      .replace(/"/g, ''); //! i added this , remove this in case of incorrect output
     setOutput(cleanedB);
-    console.log("O->",b);
-    console.log("T->",a)
-    // console.log("O->",cleanedB);
-    setTestcase(a.replace(/"/g, ""));
-    // console.log("T->",a.replace(/"/g, "")) // Remove newlines
-    } catch (error) {
-        console.log(error);
-        return error;
-    }
+    const cleanetest = testcaseans 
+                     .replace(/,\s+/g, ',')
+                     .replace(/\[\s+/g, '[').replace(/\s+\]/g, ']')
+                     .replace(/'/g, '') 
+                    //  .replace(undefined, '')
+                     .replace(/"/g, '');
+    setTest_case_ans(cleanetest);
+    // try {
+    //     const cleanedB = b 
+    //                  .replace(/,\s+/g, ',')
+    //                  .replace(/\[\s+/g, '[').replace(/\s+\]/g, ']')
+    //                  .replace(/'/g, '') 
+    //                  .replace(undefined, '')
+    //                  .replace(/"/g, ''); //! i added this , remove this in case of incorrect output
+    // setOutput(cleanedB);
+    // console.log("O real->",b);
+    // console.log("Testcase real->",a)
+    // // console.log("O->",cleanedB);
+    // setTest_case_ans(a.replace(/"/g, ""));
+    // // console.log("T->",a.replace(/"/g, "")) // Remove newlines
+    // } catch (error) {
+    //     console.log(error);
+    //     return error;
+    // }
   } 
 
     return (
         <div>
             <div className="flex flex-col lg:flex-row">
             <div className="w-full lg:w-[50%] h-[100%] bg-black">
-                <MarkdownProblem path={`${path}/Problem.md`} />
+                {/* <MarkdownProblem path={`${path}/Problem.md`} /> */}
+                <MarkdownProblem content={showMd as string} />
             </div>
             {/* <div>Output - {output}</div>
             <div>Real test cases - {testcase}</div> */}
             <div className="w-full lg:w-[50%] mt-4 lg:mt-0 lg:ml-4">
-                
-                <Codeditor code={code} setCode={setCode} setSelectedLanguage={setSelectedLanguage} />
+            {loading && <p className="font-bold text-md">Loading ...</p> }
+                { !submission ? (
+                    <Codeditor code={code} setCode={setCode} setSelectedLanguage={setSelectedLanguage} />
+                ):(
+                    <p><Submissions problemName={params.id}  /></p>
+                )}
+
+
+
                 <div className="flex w-[14rem] h-[3rem]  rounded-md justify-center items-center space-x-3 text-sm ml-2">
-                    <div
+                    {submitButton ?(
+                        <div
                         className="bg-black text-white w-[6rem] h-[2rem] flex justify-center items-center rounded-md  hover:bg-gray-800 hover:scale-105 transition cursor-pointer mt-4 lg:mt-0"
                         onClick={handleSubmit}
                     >
                         {loading ? <Loader /> : "Submit"}
                     </div>
-                    <div className="bg-black w-[6rem] h-[2rem] text-white hover:bg-gray-800 rounded-md flex justify-center items-center hover:scale-105 transition cursor-pointer">Submissions</div>
+                    ):(
+                        null
+                    )}
+                    <div className="bg-black w-[6rem] h-[2rem] text-white hover:bg-gray-800 rounded-md flex justify-center items-center hover:scale-105 transition cursor-pointer" onClick={()=>{
+                        showSubmission(p=>!p);
+                        showSubmitButton(p=>!p)
+                    }}>Submissions</div>
                 </div>
                 <div ref={scrollRef}></div>
 
             </div>
         </div>
-        {showtestcase && (<ShowTestCase output={output} testcase={testcase}/>)}
+       
+        {showtestcase && (
+             //@ts-ignore
+            <ShowTestCase output={output} testcaseans={testcaseans} testcase={testcase} problemName={params.id} type="PROBLEM" />)}
         </div>
     );
 }

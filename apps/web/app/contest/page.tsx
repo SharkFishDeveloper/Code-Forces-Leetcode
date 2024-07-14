@@ -1,16 +1,18 @@
 "use client"
-import Link from 'next/link';
-import React, { useCallback, useState } from 'react'
+
+import React, { } from 'react'
 import contest from "../../util/Contests.json";
 import ContestCard from '../../components/ContestCard';
-import Timer from '../../components/Timer';
 
 
 const Contest = () => {
+  //@ts-ignore
 const modContest = contest.sort((a,b)=>{
+  //@ts-ignore
   if(a.problems[0]?.date &&b.problems[0]?.date ){
-
+//@ts-ignore
     const dateA = new Date(a.problems[0].date).getTime();
+    //@ts-ignore
     const dateB = new Date(b.problems[0].date).getTime();
     return dateA - dateB;
   }
@@ -39,6 +41,7 @@ const topContests = modContest.slice(0, 4);
                       <div className="flex justify-center">
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                               {topContests && topContests.map((c, index) => (
+                                //@ts-ignore
                                   <ContestCard key={index} name={c.contest} problems={c.problems} />
                               ))}
                           </div>
@@ -59,6 +62,7 @@ const topContests = modContest.slice(0, 4);
                             <div>
                               <div className="font-semibold text-lg">Contest - {c.contest}</div>
                               <div className="text-gray-500 text-sm">{c.problems[0] && 
+                              //@ts-ignore
                                 formatDate(c.problems[0]?.date)}</div>
                             </div>
                             <button className="bg-black text-white py-1 px-3 rounded-md hover:bg-gray-700">Show</button>

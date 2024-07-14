@@ -10,8 +10,11 @@ import ShowTestCase from '../../../components/ShowTestCase'
 import Timer from '../../../components/Timer'
 import contestProblem from '../../functions/contestsubmit'
 import { useRouter } from 'next/navigation'
+import { Session } from 'next-auth'
 
-
+// interface SessionUser extends Session{
+//   session:{expires:{},user:{image:string,email:string,name:string,id:string}}
+// }
 
 interface Cp{
   title:string,
@@ -32,15 +35,18 @@ const ContestRound = ({params}:{params:{id:string}}) => {
   const router = useRouter();
   const [problemssolved,setProblemssolved] = useState(0);
   const [score,setScore] = useState(0);
-  const { data: session } = useSession();
-  const [problemScore,setproblemscore] = useState<{ problem: string; score: number }[]>([]);
+  const { data: session } = useSession<Session|any>();
+  
 
-  let userId:string;
+  let userId:string="";
+//@ts-ignore
   if(session?.user?.id){
+    //@ts-ignore
     userId = session?.user?.id;
     console.log(userId);
   }
-  const [contestData,setContestdata] = useState<ContestData>({ user: userId,
+  const [contestData,setContestdata] = useState<ContestData>({ 
+    user: userId,
     contest: params.id, // Initialize with appropriate initial value
     problemsSolved: 0, // Initialize with appropriate initial value
     time: '',});
@@ -60,23 +66,26 @@ const ContestRound = ({params}:{params:{id:string}}) => {
     const [cproblems,setcproblems] = useState<Cp[]|null>();
     const [boilerplate,setBoilerplate] = useState<string[]>();
     const [problemTitle,setproblemTitle] = useState<string>();
-
+    const [problemScore,setproblemscore] = useState<{ problem: string; score: number }[]>([]);
 
     const addProblemScore = () => {
+
       const existingProblemIndex = problemScore.findIndex(item => item.problem === problemTitle);
       console.log("EXISTING ,",existingProblemIndex)
+      //@ts-ignore
       if (existingProblemIndex !== -1) {
-        // Problem already exists, update the score if the new score is greater
-        if(problemScore[existingProblemIndex]){
-
-          if (score > problemScore[existingProblemIndex].score) {
-            setproblemscore(prev => {
-              const updatedProblemScore = [...prev];
-              updatedProblemScore[existingProblemIndex] = { problem: problemTitle as string, score: score };
-              return updatedProblemScore;
-            });
-          }
-        } 
+         //@ts-ignore
+      if(problemScore[existingProblemIndex]){
+         //@ts-ignore
+      if (score > problemScore[existingProblemIndex].score) {
+      setproblemscore(prev => {
+        const updatedProblemScore = [...prev];
+        updatedProblemScore[existingProblemIndex] = { problem: problemTitle as string, score: score };
+        return updatedProblemScore;
+      });
+    }
+  } 
+// }
         }
         else {
           console.log("RUNNING ELSE")
@@ -230,7 +239,10 @@ async function onFinishTimer (){
     userproblemsScore+=prob.score;
     solvedProblems++;
   });
-  const contestUserObj = {contest:contest,solvedProblems,allproblems,score:userproblemsScore,user:session?.user.id,time:currentTimeLeft,username:session?.user?.name};
+  const contestUserObj = {contest:contest,solvedProblems,allproblems,score:userproblemsScore,
+    //@ts-ignore
+    user:session? session?.user?.id:"",
+    time:currentTimeLeft,username:session?.user?.name};
 
   try {
     await contestProblem(contestUserObj)

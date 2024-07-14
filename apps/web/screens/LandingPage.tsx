@@ -2,7 +2,8 @@
 import { useSession } from 'next-auth/react'
 import Link from 'next/link'
 import React from 'react'
-
+import { Button } from '@repo/ui/button'
+import { Prisma } from '@repo/db/prisma'
 
 const LandingPage = () => {
   const { data: session } = useSession();
@@ -15,8 +16,12 @@ const LandingPage = () => {
 
       {session && (
         <div className="bg-gray-100 p-8 rounded-lg shadow-md mb-8 text-center w-80">
-          <h2 className="text-2xl font-semibold">{session.user.name}</h2>
-          <p className="text-gray-500">{session.user.email}</p>
+         {session.user && 
+          <>
+           <h2 className="text-2xl font-semibold">{session.user.name}</h2>
+           <p className="text-gray-500">{session.user.email}</p>
+           </>
+         }
         </div>
       )}
 

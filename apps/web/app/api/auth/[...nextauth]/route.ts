@@ -2,9 +2,8 @@ import { PrismaClient } from "@prisma/client";
 import NextAuth from "next-auth/next";
 import GitHubProvider from "next-auth/providers/github";
 import GoogleProvider from "next-auth/providers/google";
-import { errorToJSON } from "next/dist/server/render";
+
 const prisma = new PrismaClient();
-// import "../../../screens/autherror"
 
 const handler = NextAuth({
 

@@ -33,5 +33,10 @@
     "title": "sudokusolver",
     "path": "../../problems/sudokusolver",
     "level": "hard"
+  },
+  {
+    "title": "multiply",
+    "path": "../../problems/multiply",
+    "level": "easy"
   }
 ]

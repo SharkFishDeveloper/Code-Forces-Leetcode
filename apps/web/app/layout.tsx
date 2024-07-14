@@ -25,8 +25,8 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-        <body className={`${geistSans.variable} ${geistMono.variable}`}>
           <Providers>
+        <body className={`${geistSans.variable} ${geistMono.variable}`}>
             
         {/* <div className="h-[100%] w-[100%]"> */}
         <Appbar/>
@@ -35,8 +35,8 @@ export default function RootLayout({
             {children}
           </div>
         {/* </div> */}
-          </Providers>
       </body>
+          </Providers>
     </html>
   );
 }

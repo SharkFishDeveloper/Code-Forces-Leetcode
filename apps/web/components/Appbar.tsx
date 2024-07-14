@@ -20,7 +20,7 @@ const AppBar = () => {
       {/* Logo or Brand */}
       <div className="text-xl font-bold">
         <Link href="/" >
-          LeetCode
+          LeetForce
         </Link>
       </div>
 
@@ -33,7 +33,8 @@ const AppBar = () => {
           <span className="font-semibold hover:text-gray-300">Problems</span>
         </Link>
        {session?.user && (
-         <Link href={`/leaderboard/${session?.user.id}`} >
+        //@ts-ignore
+         <Link href={`/leaderboard/${session?.user?.id}`} >
          <span className="font-semibold hover:text-gray-300">Leaderboard</span>
        </Link>
        )}

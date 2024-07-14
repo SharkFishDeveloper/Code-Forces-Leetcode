@@ -1,16 +1,15 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, {  useState } from "react";
 import  github from "../../util/images/github.png"
 import google from "../../util/images/google-symbol.png"
 import Image from "next/image";
 import { signIn } from "next-auth/react";
 import {useRouter } from 'next/navigation';
-import { useSearchParams } from 'next/navigation'
+// import { useSearchParams } from 'next/navigation'
  
 
 const Login = () => {
   const router = useRouter();
-  const searchParams = useSearchParams()
   const [errorMessage, setErrorMessage] = useState('');
 
   const handleLogin = async (provider:string) => {
