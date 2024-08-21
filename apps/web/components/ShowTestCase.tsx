@@ -25,111 +25,73 @@ const ShowTestCase = ({ output,testcase, testcaseans, problemName,setProblemssol
   const [status,setStatus] = useState("");
   const [finish,setFinish] = useState(false);
 
-  output = output.split(',[').join('\n[');
-  testcaseans = testcaseans.replace(/\\/g, '').replace(/\[\[+/g, '[[').replace(/\]\]+/g, ']]').split(', ').join('\n').split(',[').join('\n[').replace(/\[\[/g, '[').replace(/\]\]/g, ']')
 
   if(!session){
     return alert("Please login")
   }
 
   useEffect(() => {
-    function compareLines(input: any, test: any) {
-     try {
-        
-
-        const filteredLinesInput = output.split('\n').filter((value, index, self) => self.indexOf(value) === index).filter(item => item.trim() !== '');
-
-        const filteredLinesTest = testcaseans.split('\n');
-        console.log("OUTPUT",filteredLinesInput);
-        console.log("TESTCASE",filteredLinesTest);
-        console.log("filteredLinesTest",filteredLinesTest.length);
-
-        let passedCount = 0;
-        setTotalTestCase(filteredLinesTest.length);
-
-
-        for (let i = 0; i < filteredLinesTest.length; i++) {
-          const lineInput = filteredLinesInput[i]?.trim().replace(/\s+/g, '').replace(/^\[|\]$/g, '').replace(/\[|\]/g, '');
-          const lineTest = filteredLinesTest[i]?.trim().replace(/\s+/g, '').replace(/^\[|\]$/g, '').replace("[","").replace("]","");
-          console.log(lineInput,lineTest);
-          if (lineInput === lineTest) {
-              passedCount++;
-              setPassedTestCase(passedCount);
-              setFinish(true);
-            }else{
-                // console.log(testcase[passedCount]);
-                // setErrortestcase(lineTest);
-                setErrortestcase(testcase[passedCount].toString())
-                console.log("WRONG ouptut",lineInput);
-                setOutputtestcase(lineInput);
-                setCorrectoutput(lineTest);
-                setFinish(true);
-                return;
-            }
-        }
-        
-  
-        
-
-     } catch (error) {
-        console.log(error);
-        return alert("Try another problem");
-     }
+    function compareLines() {
+      try {
+        console.log("given testcase ans =>",testcaseans)
+        console.log("your output =>",output)
+      } catch (error) {
+        console.log(error)
+      }
     }
-
-    compareLines(output, testcaseans);
+    compareLines();
   }, [output, testcaseans]);
 
 
-  useEffect(() => {
+//   useEffect(() => {
 
-    if (setScore && setProblemssolved) {
-      const percentPassed = Math.floor((passedTestCase / totalTestCase) * 100);
-      if (percentPassed > 0) {
-        //@ts-ignore
-        setProblemssolved( problemssolved + 1); // Increment problemssolved by 1
-        //@ts-ignore
-        setScore( percentPassed); // Increment score based on percent passed
-      }
-    }
-  },  [passedTestCase, totalTestCase, setProblemssolved, setScore]);
+//     if (setScore && setProblemssolved) {
+//       const percentPassed = Math.floor((passedTestCase / totalTestCase) * 100);
+//       if (percentPassed > 0) {
+//         //@ts-ignore
+//         setProblemssolved( problemssolved + 1); // Increment problemssolved by 1
+//         //@ts-ignore
+//         setScore( percentPassed); // Increment score based on percent passed
+//       }
+//     }
+//   },  [passedTestCase, totalTestCase, setProblemssolved, setScore]);
 
-  const submitOnCorrect =async ()=>{
-    var statusText="";
-    if(passedTestCase===totalTestCase){
-      setStatus("Accepted");
-      statusText = "Accepted"
-    }else if(passedTestCase.valueOf()!==totalTestCase.valueOf()){
-      setStatus("WrongAnswer");
-      statusText = "WrongAnswer"
-    }else{
-      setStatus("CompileError");
-      statusText = "CompileError"
+//   const submitOnCorrect =async ()=>{
+//     var statusText="";
+//     if(passedTestCase===totalTestCase){
+//       setStatus("Accepted");
+//       statusText = "Accepted"
+//     }else if(passedTestCase.valueOf()!==totalTestCase.valueOf()){
+//       setStatus("WrongAnswer");
+//       statusText = "WrongAnswer"
+//     }else{
+//       setStatus("CompileError");
+//       statusText = "CompileError"
 
-    }
-    console.log("#########3",statusText)
+//     }
+//     console.log("#########3",statusText)
    
-   try {
-    const resp = await axios.put(`${FRONTEND_URL}/api/submissions`,{
-      //@ts-ignore
-      userId : session.data?.user.id,
-      status : statusText,
-      problemName : problemName
-    });
-    console.log("Success",resp.data)
-   } catch (error) {
-    return alert("Some error in submission tab")
-   }
+//    try {
+//     const resp = await axios.put(`${FRONTEND_URL}/api/submissions`,{
+//       //@ts-ignore
+//       userId : session.data?.user.id,
+//       status : statusText,
+//       problemName : problemName
+//     });
+//     console.log("Success",resp.data)
+//    } catch (error) {
+//     return alert("Some error in submission tab")
+//    }
  
-  }
- useEffect(()=>{
+//   }
+//  useEffect(()=>{
    
-  if (  type === "PROBLEM" && finish && passedTestCase===totalTestCase) {
-    submitOnCorrect();
-  }
- },[finish])
+//   if (type === "PROBLEM" && finish && passedTestCase===totalTestCase) {
+//     submitOnCorrect();
+//   }
+//  },[finish])
 
- console.log("--------->",status);
+//  console.log("--------->",status);
   return (
     <div className="flex items-center justify-center min-h-[50%] bg-white p-4 text-white">
   <div className="w-full max-w-4xl bg-black shadow-md rounded-md p-4 flex flex-col lg:flex-row">

@@ -16,9 +16,9 @@ interface ContestProps {
 }
 
 
-const ContestCard= ({ name, problems }:ContestProps) => {
+const ContestCard= ({ name, problems,dateProblem,score }:{ name:string, problems:string[],dateProblem:string,score:string[] }) => {
     //@ts-ignore
-    const date = new Date(problems[0]?.date);
+    const date = new Date(dateProblem);
     const formattedDate = date.toLocaleString('en-US', {
         weekday: 'short',
         year: 'numeric',
@@ -43,7 +43,8 @@ const ContestCard= ({ name, problems }:ContestProps) => {
             <div className="flex items-center justify-center bg-black text-white h-[3rem] rounded-md hover:bg-gray-800 cursor-pointer" >
                 <Link  href={`/contest/${name}`} onClick={()=>{
                     localStorage.setItem("contest-name",name);
-                    if(problems)localStorage.setItem("contest-problems",JSON.stringify(problems));  
+                    if(problems)localStorage.setItem("contest-problems",JSON.stringify(problems));
+                    localStorage.setItem('contest-score',JSON.stringify(score))  
                 }}>Participate</Link>
             </div>
         </div>

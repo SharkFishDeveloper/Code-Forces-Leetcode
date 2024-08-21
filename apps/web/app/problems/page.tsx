@@ -1,9 +1,9 @@
 "use client"
 import React, { useEffect, useState } from 'react';
-import problems from "../../util/Problems.json";
+// import problems from "../../util/Problems.json";
 import ProblemCard from '../../components/ProblemCard';
-import fetchProblems from '../../util/functionFetch/problems';
-import Loader from '../../components/Loader';
+// import fetchProblems from '../../util/functionFetch/problems';
+// import Loader from '../../components/Loader';
 import Pingingloader from '../../components/Pingingloader';
 import axios from 'axios';
 import FRONTEND_URL from '../functions/frontendurl';
@@ -60,7 +60,6 @@ const Problems = () => {
                             key={index} 
                             title={problem.slug} 
                             level={problem.level}
-                            // path={problem.path} 
                             index={(index+1).toString()}
                         />
                     ))}

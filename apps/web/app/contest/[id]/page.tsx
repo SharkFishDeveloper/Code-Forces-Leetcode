@@ -4,13 +4,15 @@ import Codeditor from '../../../components/Codeditor'
 import { Submit } from '../../functions/submit'
 import Loader from '../../../components/Loader'
 import {  useSession } from 'next-auth/react'
-import { fetchBoilerPlateCode } from '../../functions/boilerplatecode'
+// import { fetchBoilerPlateCode } from '../../functions/boilerplatecode'
 import MarkdownProblem from '../../../components/MarkdownProblem'
 import ShowTestCase from '../../../components/ShowTestCase'
 import Timer from '../../../components/Timer'
 import contestProblem from '../../functions/contestsubmit'
 import { useRouter } from 'next/navigation'
 import { Session } from 'next-auth'
+import axios from 'axios'
+import FRONTEND_URL from '../../functions/frontendurl'
 
 // interface SessionUser extends Session{
 //   session:{expires:{},user:{image:string,email:string,name:string,id:string}}
@@ -18,10 +20,10 @@ import { Session } from 'next-auth'
 
 interface Cp{
   title:string,
-  path:string,
-  level:string,
-  score:string,
-  date:string
+  // path:string,
+  // level:string,
+  // score:string,
+  // date:string
 }
 interface ContestData {
   user: string; // Assuming userId is a string
@@ -63,10 +65,18 @@ const ContestRound = ({params}:{params:{id:string}}) => {
     const [output, setOutput] = useState("");
     const [showtestcase,setShowtestcase] = useState(false);
     const scrollRef = useRef<HTMLDivElement>(null);
-    const [cproblems,setcproblems] = useState<Cp[]|null>();
+
+    const [cproblems,setcproblems] = useState<string[]|null>();
+
     const [boilerplate,setBoilerplate] = useState<string[]>();
     const [problemTitle,setproblemTitle] = useState<string>();
     const [problemScore,setproblemscore] = useState<{ problem: string; score: number }[]>([]);
+    const [showMd,setShowmd] = useState<string|null>("");
+
+
+    const [testcaseans,setTest_case_ans] = useState("");
+
+
 
     const addProblemScore = () => {
 
@@ -109,7 +119,36 @@ const ContestRound = ({params}:{params:{id:string}}) => {
     const handleTimerTick = useCallback((timeLeft: number) => {
       setCurrentTimeLeft(timeLeft);
     }, []);
-  
+    
+
+
+
+  ///////////////////////////////////////////////////////////////////
+    useEffect(()=>{
+      setLoading(true);
+      const findMd = async()=>{
+         try {
+          const resp = await axios.post(`${FRONTEND_URL}/api/prob-description`,{slug:problemTitle});
+          setShowmd(resp.data.message.description);
+          setTest_case_ans(resp.data.message.test_cases_ans);
+          setTestcase(resp.data.message.test_cases);
+          console.log(resp.data.message.test_cases_ans);
+
+         } catch (error) {
+          console.log(error);
+          return alert("Something bad happened");
+         }finally{
+          setLoading(false);
+         }
+      }
+      findMd();
+      console.log("I ran");
+      console.log(selectedLanguage);
+      
+  },[problemTitle]);
+
+  ///////////////////////////////////////////////////////////////////
+
 
     useEffect(() => {
       // Scroll to ref if showtestcase changes
@@ -118,34 +157,50 @@ const ContestRound = ({params}:{params:{id:string}}) => {
       }
     }, [showtestcase]);
 
+
+
+
+
     useEffect(() => {
       // Fetch problems from localStorage on component mount
       const getProblems = () => {
         const problems = localStorage.getItem('contest-problems');
+        const score = localStorage.getItem('contest-score');
+        setproblemscore(score && JSON.parse(score));
         if (problems) {
           setcproblems(JSON.parse(problems));
         }
+        console.log("PROBLEMS",problems && JSON.parse(problems))
       };
       getProblems();
     }, []);
   
+
+
+
     useEffect(() => {
       // Fetch initial problem and set boilerplate on cproblems update
       if (cproblems && cproblems[0]) {
-        const selectedProblemTitle = cproblems[0].title;
+        const selectedProblemTitle = cproblems[0];
         setproblemTitle(selectedProblemTitle);
-        fetchBoilerPlate({ title: selectedProblemTitle });
+        fetchBoilerPlate({ title: selectedProblemTitle,language:selectedLanguage });
+        // console.log(cproblems[0]);
       }
     }, [cproblems]);
   
+
+
+
     useEffect(() => {
-      // Fetch boilerplate code when selectedLanguage changes
+      console.log("CHANGING LANGUAGE ",selectedLanguage,problemTitle);
       if (problemTitle) {
-        fetchBoilerPlate({ title: problemTitle });
+        fetchBoilerPlate({ title: problemTitle,language:selectedLanguage });
       }
     }, [selectedLanguage, problemTitle]);
     
-    const fetchBoilerPlate = async ({title}:{title:string}) => {
+
+
+    const fetchBoilerPlate = async ({title,language}:{title:string,language:string}) => {
       try {
           const language = selectedLanguage === "C++" ? "cpp" :
               selectedLanguage === "Java" ? "java" :
@@ -153,10 +208,11 @@ const ContestRound = ({params}:{params:{id:string}}) => {
               selectedLanguage === "Javascript" ? "js" :
               selectedLanguage === "Rust" ? "rs" :
               "";
-          const bpCode = await fetchBoilerPlateCode(`../../../apps/problems/${title}/boilerplate/function.${language}` as string);
-          setCode(bpCode.code);
-          setFullCode(bpCode.fullcode);
-          setTestcase(bpCode.test_case_code);
+              const bpCode = await axios.post(`${FRONTEND_URL}/api/problems-boilerplate`,{slug:title,language:language});
+              setCode(bpCode.data.message.boilerplateHalf);
+              setFullCode(bpCode.data.message.boilerplateFull);
+              // let test = JSON.parse(bpCode.data.message.test_cases);
+              // setTestcase(test);
           console.log(bpCode)
       } catch (error) {
           alert("An error occurred");
@@ -165,7 +221,6 @@ const ContestRound = ({params}:{params:{id:string}}) => {
 
     const runAgainFx = async () => {
         try {
-            console.log("In run again function");
             await handleSubmit();
         } catch (error) {
             console.log(error);
@@ -190,22 +245,19 @@ async function checkTestCases(outputs:string) {
             const importsText = imports.join('\n').trim();
             const finalCodeWithoutImports = final_user_code.replace(importRegex, '');
             final_user_code = `${importsText}${finalCodeWithoutImports}`
-
-            console.log("%%%%",final_user_code)
         }
         else{
              final_user_code = fullcode.replace("###USER_CODE_HERE", code);
         }
-        console.log("final_user_code",final_user_code)
         setLoading(true);
         try {
             const Language = selectedLanguage.toLowerCase();
-            const resp = await Submit({ userId: "shahzeb012", selectedLanguage: Language, code: final_user_code });
-            console.log("!!!!!!!!!!!!@@@@@@@@",final_user_code)
+            const resp = await Submit({  selectedLanguage: Language, code: final_user_code });
+
             if(resp?.status===300){
                 return alert(resp.message)
             }
-            console.log("@@@@@@@@@@@",resp)
+            // console.log("@@@@@@@@@@@",resp)
             if (resp?.result.run.signal === "SIGKILL" && retryCount < maxRetries) {
                 retryCount++;
                 await runAgainFx();
@@ -214,12 +266,12 @@ async function checkTestCases(outputs:string) {
                 retryCount = 0;
                 return;
             } else if (resp?.result.run.output!==undefined) {
-              console.log("blkaf",resp?.result.run.output);
+              // console.log("blkaf",resp?.result.run.output);
               setOutput(resp?.result.run.output);
             }
              await checkTestCases(resp?.result.run.output);
         } catch (error) {
-            console.log("over")
+            // console.log("over")
             return alert(error);
         } finally {
             setLoading(false);
@@ -259,25 +311,42 @@ async function onFinishTimer (){
 
 
 
-  function compareStructuredData(a:any,b:any){
-    try {
-        const cleanedB = b 
-                     .replace(/,\s+/g, ',')
-                     .replace(/\[\s+/g, '[').replace(/\s+\]/g, ']')
-                     .replace(/'/g, '') 
-                     .replace(undefined, '')
-                     .replace(/"/g, ''); //! i added this , remove this in case of incorrect output
-    setOutput(cleanedB);
-    console.log("O->",b);
-    console.log("T->",a)
-    // console.log("O->",cleanedB);
-    setTestcase(a.replace(/"/g, ""));
-    // console.log("T->",a.replace(/"/g, "")) // Remove newlines
-    } catch (error) {
-        console.log(error);
-        return error;
-    }
-  } 
+  
+function compareStructuredData(a:any,b:any){
+  //  console.log("O real->",b);
+  // console.log("Testcase real->",a.flat().join('\n'))
+  const cleanedB = b 
+                   .replace(/,\s+/g, ',')
+                   .replace(/\[\s+/g, '[').replace(/\s+\]/g, ']')
+                   .replace(/'/g, '') 
+                   .replace(undefined, '')
+                   .replace(/"/g, ''); //! i added this , remove this in case of incorrect output
+  setOutput(cleanedB);
+  const cleanetest = testcaseans 
+                   .replace(/,\s+/g, ',')
+                   .replace(/\[\s+/g, '[').replace(/\s+\]/g, ']')
+                   .replace(/'/g, '') 
+                  //  .replace(undefined, '')
+                   .replace(/"/g, '');
+  setTest_case_ans(cleanetest);
+  // try {
+  //     const cleanedB = b 
+  //                  .replace(/,\s+/g, ',')
+  //                  .replace(/\[\s+/g, '[').replace(/\s+\]/g, ']')
+  //                  .replace(/'/g, '') 
+  //                  .replace(undefined, '')
+  //                  .replace(/"/g, ''); //! i added this , remove this in case of incorrect output
+  // setOutput(cleanedB);
+  // console.log("O real->",b);
+  // console.log("Testcase real->",a)
+  // // console.log("O->",cleanedB);
+  // setTest_case_ans(a.replace(/"/g, ""));
+  // // console.log("T->",a.replace(/"/g, "")) // Remove newlines
+  // } catch (error) {
+  //     console.log(error);
+  //     return error;
+  // }
+} 
   console.log("problemTitle",problemTitle)
   console.log(problemssolved);
 
@@ -285,7 +354,7 @@ async function onFinishTimer (){
     <div className="">
       {/* <div>{JSON.stringify(problemScore)}</div> */}
          <div className=" text-center">
-      
+      {score }
 
         <div className="text-lg font-bold flex justify-between p-3">
         <p className="font-bold text-2xl">Welcome to round - {params.id}</p>
@@ -300,13 +369,13 @@ async function onFinishTimer (){
         </div>
         <div className="flex ">
         {cproblems && cproblems.map((c,i)=>(
-          <div key={i} className="h-[2.4rem] w-[5.2rem] bg-gray-800 text-white rounded-lg flex items-center justify-center ml-3 mb-1 text-sm hover:bg-gray-600 transition cursor-pointer " 
+          <div key={i} className="h-[2.4rem] w-[6rem] bg-gray-800 text-white rounded-lg flex items-center justify-center ml-3 mb-1 text-sm hover:bg-gray-600 transition cursor-pointer " 
           onClick={()=>
-           { setproblemTitle(c.title)
-            fetchBoilerPlate({title:c.title})}
+           { setproblemTitle(c)
+            fetchBoilerPlate({title:c,language:selectedLanguage})}
           }
           >
-          {c.title.substring(0,1).toUpperCase()+c.title.substring(1,c.title.length)}
+          {c && c.substring(0,1).toUpperCase()+c.substring(1,c.length)}
           </div>
         ))}
 
@@ -315,7 +384,7 @@ async function onFinishTimer (){
         <div className="flex flex-col lg:flex-row">
             <div className="w-full lg:w-[50%] h-[100%] bg-black">
             {problemTitle ? (
-      <MarkdownProblem path={`../../problems/${problemTitle}/Problem.md`} />
+      <MarkdownProblem content={showMd as string} />
     ) : (
       <div className="text-center">Loading problem...</div>
     )}
@@ -331,9 +400,9 @@ async function onFinishTimer (){
         </div>
       </div>
     </div>
-      {showtestcase && (<ShowTestCase output={output} testcase={testcase} setProblemssolved={setProblemssolved} problemssolved={problemssolved}
-      score={score} setScore={setScore}
-      />)}
+    {showtestcase && (
+             //@ts-ignore
+            <ShowTestCase output={output} testcaseans={testcaseans} testcase={testcase} problemName={params.id} type="CONTEST" />)}
     </div>
   )
 }

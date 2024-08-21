@@ -6,7 +6,7 @@ import { PROBLEM_PATH } from "./util/path";
 import { ProblemDefinitionParser } from "./userBoiler";
 import { FullBoilerplate } from "./fullboilerplate";
 const prisma = new PrismaClient();
-
+prisma.$connect();
 
 const rl = readline.createInterface({
     input: process.stdin,
@@ -85,24 +85,22 @@ async function processInputFiles(problem: string,difficulty:string,inputpath:str
         problems.push({title:problem,path:`../../problems/${problem}`,level:difficultyLevel});
         fs.writeFileSync((path.join(__dirname, '../../web/util/Problems.json')), JSON.stringify(problems, null, 2));
     }
-    
-    // console.log("data",problems);
-
 //!
 
     const fullBoiler = new FullBoilerplate(cppCode,javaCode,problem,inputFields,outputFields,functionName);
     let test_case:any = fullBoiler.testcases;
-    // console.log(test_case);
-    test_case = JSON.stringify(test_case);
+
+    // test_case = JSON.stringify(test_case);
 
     let test_case_ans:any = fullBoiler.testcases_ans;
-    test_case_ans = JSON.stringify(test_case_ans);
-
+    // let test_case_ans1 = JSON.stringify(test_case_ans);
+    // console.log("ANS=>",test_case_ans);
+    
     const fcppCode = fullBoiler.generateCpp();
     const fjavaCode = fullBoiler.generateJava();
+    console.log(fjavaCode);
     const fpythonCode = fullBoiler.generatePython();
     const fjsCode = fullBoiler.generateJs();
-    const frustCode = fullBoiler.generateRust();
     if(!fs.existsSync(fullBoilerplate)){
         fs.mkdirSync(fullBoilerplate,{recursive:true})
     }
@@ -123,32 +121,51 @@ async function processInputFiles(problem: string,difficulty:string,inputpath:str
     fs.writeFileSync(path.join(fullBoilerplate,"function.java"),fjavaCode);
     fs.writeFileSync(path.join(fullBoilerplate,"function.py"),fpythonCode);
     fs.writeFileSync(path.join(fullBoilerplate,"function.js"),fjsCode);
-    fs.writeFileSync(path.join(fullBoilerplate,"function.rs"),frustCode);
+    // fs.writeFileSync(path.join(fullBoilerplate,"function.rs"),frustCode);
     }
 
 
     const dbfillProblems = async(problem:string,readmeData:string,difficultyLevel:string,javaCode:string,cppCode:string,pythonCode:string,jsCode:string,fjavaCode:string,fcppCode:string,fpythonCode:string,fjsCode:string,test_case:any,test_case_ans:any)=>{
-        await prisma.problems.createMany({
-            data:[
-                {
-                    slug:problem,
-                    level:difficultyLevel,
-                    boilerplateCppHalf:cppCode,
-                    boilerplateJavaHalf:javaCode,
-                    boilerplateJavascriptHalf:jsCode,
-                    boilerplatePythonHalf:pythonCode,
-                    boilerplateCppFull:fcppCode,
-                    boilerplateJavaFull:fjavaCode,
-                    boilerplateJavascriptFull:fjsCode,
-                    boilerplatePythonFull:fpythonCode,
-                    description:readmeData,
-                    test_cases:test_case,
-                    test_cases_ans:test_case_ans
-                }
-            ]
-        })
-        console.log("type of test",typeof test_case,test_case);
-        console.log("type of ans",typeof test_case_ans,test_case_ans);
+        const ans = await prisma.problems.upsert({
+            where: {
+                slug: problem,
+                level: difficultyLevel          
+            },
+            update: {
+              description: readmeData,
+              boilerplateCppHalf: cppCode,
+              boilerplateJavaHalf: javaCode,
+              boilerplateJavascriptHalf: jsCode,
+              boilerplatePythonHalf: pythonCode,
+              boilerplateCppFull: fcppCode,
+              boilerplateJavaFull: fjavaCode,
+              boilerplateJavascriptFull: fjsCode,
+              boilerplatePythonFull: fpythonCode,
+              test_cases: test_case,
+              test_cases_ans: test_case_ans
+            },
+            create: {
+              slug: problem,
+              level: difficultyLevel,
+              description: readmeData,
+              boilerplateCppHalf: cppCode,
+              boilerplateJavaHalf: javaCode,
+              boilerplateJavascriptHalf: jsCode,
+              boilerplatePythonHalf: pythonCode,
+              boilerplateCppFull: fcppCode,
+              boilerplateJavaFull: fjavaCode,
+              boilerplateJavascriptFull: fjsCode,
+              boilerplatePythonFull: fpythonCode,
+              test_cases: test_case,
+              test_cases_ans: test_case_ans
+            },
+            select:{
+                test_cases_ans:true
+            }
+          });
+        // console.log("type of test",test_case);
+        console.log("type of ans =>",ans.test_cases_ans);
+        prisma.$disconnect()
     }
 //   model Problems{
     //     slug String @id -
@@ -442,7 +459,7 @@ rl.question('Please enter the name of the problem file or type cts: ', (problemF
                 return console.log(round);
             }
         }
-    )
+        )
     }
 
 
