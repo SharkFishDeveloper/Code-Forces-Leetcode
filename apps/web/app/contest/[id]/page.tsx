@@ -4,7 +4,6 @@ import Codeditor from '../../../components/Codeditor'
 import { Submit } from '../../functions/submit'
 import Loader from '../../../components/Loader'
 import {  useSession } from 'next-auth/react'
-// import { fetchBoilerPlateCode } from '../../functions/boilerplatecode'
 import MarkdownProblem from '../../../components/MarkdownProblem'
 import ShowTestCase from '../../../components/ShowTestCase'
 import Timer from '../../../components/Timer'
@@ -14,17 +13,6 @@ import { Session } from 'next-auth'
 import axios from 'axios'
 import FRONTEND_URL from '../../functions/frontendurl'
 
-// interface SessionUser extends Session{
-//   session:{expires:{},user:{image:string,email:string,name:string,id:string}}
-// }
-
-interface Cp{
-  title:string,
-  // path:string,
-  // level:string,
-  // score:string,
-  // date:string
-}
 interface ContestData {
   user: string; // Assuming userId is a string
   contest: string; // Placeholder, adjust as per your actual data structure
@@ -95,7 +83,6 @@ const ContestRound = ({params}:{params:{id:string}}) => {
       });
     }
   } 
-// }
         }
         else {
           console.log("RUNNING ELSE")
@@ -121,22 +108,23 @@ const ContestRound = ({params}:{params:{id:string}}) => {
     }, []);
     
 
-
-
-  ///////////////////////////////////////////////////////////////////
     useEffect(()=>{
       setLoading(true);
       const findMd = async()=>{
          try {
           const resp = await axios.post(`${FRONTEND_URL}/api/prob-description`,{slug:problemTitle});
-          setShowmd(resp.data.message.description);
-          setTest_case_ans(resp.data.message.test_cases_ans);
-          setTestcase(resp.data.message.test_cases);
-          console.log(resp.data.message.test_cases_ans);
-
+          if(resp.status === 200){
+            setShowmd(resp.data.message.description);
+            setTest_case_ans(resp.data.message.test_cases_ans);
+            setTestcase(resp.data.message.test_cases);
+            console.log(resp.data.message.test_cases_ans);
+          }
+          else if(resp.status === 400){
+            return alert("Something bad happened");
+          }
          } catch (error) {
-          console.log(error);
-          return alert("Something bad happened");
+          console.log(error)
+          // return alert("Someth sing bad happened");
          }finally{
           setLoading(false);
          }
@@ -146,8 +134,6 @@ const ContestRound = ({params}:{params:{id:string}}) => {
       console.log(selectedLanguage);
       
   },[problemTitle]);
-
-  ///////////////////////////////////////////////////////////////////
 
 
     useEffect(() => {
@@ -230,8 +216,8 @@ const ContestRound = ({params}:{params:{id:string}}) => {
 
     
 
-async function checkTestCases(outputs:string) {
-      compareStructuredData(testcase,outputs);
+async function checkTestCases() {
+      console.log(code)
       setShowtestcase(true);
   }
 
@@ -248,6 +234,7 @@ async function checkTestCases(outputs:string) {
         }
         else{
              final_user_code = fullcode.replace("###USER_CODE_HERE", code);
+             console.log(final_user_code)
         }
         setLoading(true);
         try {
@@ -257,7 +244,6 @@ async function checkTestCases(outputs:string) {
             if(resp?.status===300){
                 return alert(resp.message)
             }
-            // console.log("@@@@@@@@@@@",resp)
             if (resp?.result.run.signal === "SIGKILL" && retryCount < maxRetries) {
                 retryCount++;
                 await runAgainFx();
@@ -266,10 +252,10 @@ async function checkTestCases(outputs:string) {
                 retryCount = 0;
                 return;
             } else if (resp?.result.run.output!==undefined) {
-              // console.log("blkaf",resp?.result.run.output);
+              console.log(resp?.result.run.output)
               setOutput(resp?.result.run.output);
             }
-             await checkTestCases(resp?.result.run.output);
+             await checkTestCases();
         } catch (error) {
             // console.log("over")
             return alert(error);
@@ -309,52 +295,13 @@ async function onFinishTimer (){
 }
 
 
-
-
-  
-function compareStructuredData(a:any,b:any){
-  //  console.log("O real->",b);
-  // console.log("Testcase real->",a.flat().join('\n'))
-  const cleanedB = b 
-                   .replace(/,\s+/g, ',')
-                   .replace(/\[\s+/g, '[').replace(/\s+\]/g, ']')
-                   .replace(/'/g, '') 
-                   .replace(undefined, '')
-                   .replace(/"/g, ''); //! i added this , remove this in case of incorrect output
-  setOutput(cleanedB);
-  const cleanetest = testcaseans 
-                   .replace(/,\s+/g, ',')
-                   .replace(/\[\s+/g, '[').replace(/\s+\]/g, ']')
-                   .replace(/'/g, '') 
-                  //  .replace(undefined, '')
-                   .replace(/"/g, '');
-  setTest_case_ans(cleanetest);
-  // try {
-  //     const cleanedB = b 
-  //                  .replace(/,\s+/g, ',')
-  //                  .replace(/\[\s+/g, '[').replace(/\s+\]/g, ']')
-  //                  .replace(/'/g, '') 
-  //                  .replace(undefined, '')
-  //                  .replace(/"/g, ''); //! i added this , remove this in case of incorrect output
-  // setOutput(cleanedB);
-  // console.log("O real->",b);
-  // console.log("Testcase real->",a)
-  // // console.log("O->",cleanedB);
-  // setTest_case_ans(a.replace(/"/g, ""));
-  // // console.log("T->",a.replace(/"/g, "")) // Remove newlines
-  // } catch (error) {
-  //     console.log(error);
-  //     return error;
-  // }
-} 
   console.log("problemTitle",problemTitle)
   console.log(problemssolved);
 
   return (
     <div className="">
-      {/* <div>{JSON.stringify(problemScore)}</div> */}
          <div className=" text-center">
-      {score }
+      Score - {score }
 
         <div className="text-lg font-bold flex justify-between p-3">
         <p className="font-bold text-2xl">Welcome to round - {params.id}</p>

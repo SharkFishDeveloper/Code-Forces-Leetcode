@@ -151,9 +151,9 @@ export class FullBoilerplate{
       const pythonCode = `
           ###USER_CODE_HERE
 def main():
-      ${this.testcases.map((test, index) => {
+    ${this.testcases.map((test, index) => {
           // Assuming `test` is a string that needs to be split by space
-          const splitTest = test.split(" "); // Split test string into individual elements
+        const splitTest = test.split(" "); // Split test string into individual elements
   
           return `
       result_${index + 1} = ${this.problem}(${splitTest.map((t: any) => `${t}`).join(', ')})
@@ -161,7 +161,7 @@ def main():
       }).join('\n    ')}
   
 if __name__ == "__main__":
-      main()
+    main()
       `;
       return pythonCode.trim();
   }
@@ -359,7 +359,7 @@ const resultJava = ((ds:any) => {
           for (int i = 0; i < ${name}.size(); i++) {
               System.out.print("[");
               for (int j = 0; j < ${name}.get(i).size(); j++) {
-                  System.out.print("\" + ${name}.get(i).get(j) + "\");
+                  System.out.print("\\"" + ${name}.get(i).get(j) + "\\"");
                   if (j < ${name}.get(i).size() - 1) {
                       System.out.print(",");
                   }

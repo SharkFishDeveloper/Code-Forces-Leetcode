@@ -99,7 +99,6 @@ const Problem = ({ params }: { params: { id: string, title: string, path: string
     
     const runAgainFx = async () => {
         try {
-            // console.log("In run again function");
             await handleSubmit();
         } catch (error) {
             console.log(error);
@@ -138,7 +137,6 @@ const Problem = ({ params }: { params: { id: string, title: string, path: string
             } else if (resp?.result.run.output!==undefined) {
               setOutput(resp?.result.run.output);
             }
-            //  await checkTestCases(resp?.result.run.output);
              await checkTestCases();
         } catch (error) {
             return alert(error);
@@ -148,33 +146,16 @@ const Problem = ({ params }: { params: { id: string, title: string, path: string
     }
 
     async function checkTestCases() {
-
-    //   compareStructuredData(testcaseans,outputs);
       setShowtestcase(true);
     }
 
-//   function compareStructuredData(a:any,b:any){
-//     const cleanedB = b 
-//                      .replace(/,\s+/g, ',')
-//                      .replace(/\[\s+/g, '[').replace(/\s+\]/g, ']')
-//                      .replace(/'/g, '') 
-//                      .replace(undefined, '')
-//                      .replace(/"/g, ''); //! i added this , remove this in case of incorrect output
-//     setOutput(cleanedB);
-//     const cleanetest = testcaseans 
-//                      .replace(/,\s+/g, ',')
-//                      .replace(/\[\s+/g, '[').replace(/\s+\]/g, ']')
-//                      .replace(/'/g, '') 
-//                      .replace(/"/g, '');
-//     setTest_case_ans(cleanetest);
-//   } 
-
+    console.log("rnning")
 
 
     return (
         <div>
             <div className="flex flex-col lg:flex-row">
-            <div className="w-full lg:w-[50%] h-[100%] bg-black">
+            <div className="w-full lg:w-[50%] h-[54rem] bg-black">
                 <MarkdownProblem content={showMd as string} />
             </div>
             <div className="w-full lg:w-[50%] mt-4 lg:mt-0 lg:ml-4">
@@ -206,13 +187,13 @@ const Problem = ({ params }: { params: { id: string, title: string, path: string
             </div>
         </div>
 
-        {testcaseans && output && (
+        {/* {testcaseans && output && (
             <div>
                 <p>TESTCASE - {testcase}</p>
                 <p>GIVEN ANS - {testcaseans}</p>
                 <p>OUTPUT - {output}</p>
             </div>
-        )}
+        )} */}
         {showtestcase && (
              //@ts-ignore
             <ShowTestCase output={output} testcaseans={testcaseans} testcase={testcase} problemName={params.id} type="PROBLEM" />)}

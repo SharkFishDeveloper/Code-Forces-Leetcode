@@ -14,13 +14,32 @@ interface TestcaseInterface {
   setScore:(n:number)=>void;
   type:string
 }
+//@ts-ignore
+function deepEqual(a, b) {
+  if (Array.isArray(a) && Array.isArray(b)) {
+      if (a.length !== b.length) return false;
+      return a.every((el, idx) => deepEqual(el, b[idx]));
+  }
+
+  if (typeof a === 'object' && a !== null && typeof b === 'object' && b !== null) {
+      const keysA = Object.keys(a);
+      const keysB = Object.keys(b);
+
+      if (keysA.length !== keysB.length) return false;
+      return keysA.every(key => deepEqual(a[key], b[key]));
+  }
+
+  return a === b;
+}
+
+
 
 const ShowTestCase = ({ output,testcase, testcaseans, problemName,setProblemssolved, problemssolved,score,setScore,type }: TestcaseInterface) => {
   const [passedTestCase, setPassedTestCase] = useState(0);
   const [totalTestCase, setTotalTestCase] = useState(0);
-  const [errortestcase,setErrortestcase] = useState<string|undefined>("");
-  const [outputtestcase,setOutputtestcase] = useState<string|undefined>("");
-  const [correctOutput,setCorrectoutput] = useState<string|null>("");
+  // const [errortestcase,setErrortestcase] = useState(0);
+  // const [outputtestcase,setOutputtestcase] = useState<string|undefined>("");
+  // const [correctOutput,setCorrectoutput] = useState<string|null>("");
   const session = useSession();
   const [status,setStatus] = useState("");
   const [finish,setFinish] = useState(false);
@@ -28,73 +47,60 @@ const ShowTestCase = ({ output,testcase, testcaseans, problemName,setProblemssol
 
   if(!session){
     return alert("Please login")
+  } 
+  
+
+  const testcasesOutputgiven = testcaseans.filter((line:any) => line.trim() !== '').map((line:any) => line.trim().replace(/\r/g, '')); 
+  console.log("----------------------------")
+  
+  // console.log("original OOUtpout",output,typeof output);
+  let yourOutput = output.split("\n").filter((line:any)=>line!=="");
+  // console.log("givenOutput",testcasesOutputgiven);
+  // console.log("youroutput",yourOutput);
+
+  if(yourOutput.length > testcasesOutputgiven.length){
+    const concatenatedString = yourOutput.join('');
+    let b = concatenatedString.replace(/\]\[/g, "]\n[");
+    yourOutput = b.split("\n");
   }
 
-  useEffect(() => {
-    function compareLines() {
+  function compareLines() {
+    let passedCount = 0;
+    setTotalTestCase(testcase.length);
+     for (let index = 0; index < testcasesOutputgiven.length; index++) {
+    const test = testcasesOutputgiven[index];
+    const yourOutputValue = yourOutput[index];
+    console.log("test",test,"yourOutput",yourOutputValue)
+      console.log(`${index}`,test.replace(/\s+/g, ''),yourOutput[index].replace(/\s+/g, ''))
       try {
-        console.log("given testcase ans =>",testcaseans)
-        console.log("your output =>",output)
+
+        const check = deepEqual(yourOutputValue.replace(/\s+/g, ''),test.replace(/\s+/g, ''));
+        if(check){
+          passedCount += 1;
+          console.log("PASSED",yourOutput[index],test)
+        }else{
+          console.log("NOT PASSED",yourOutput[index],test)
+          break;
+        }
       } catch (error) {
         console.log(error)
       }
-    }
+     
+      setPassedTestCase(passedCount);
+
+    };
+  }
+
+useEffect(() => {
     compareLines();
-  }, [output, testcaseans]);
+  }, [testcaseans]);
 
 
-//   useEffect(() => {
-
-//     if (setScore && setProblemssolved) {
-//       const percentPassed = Math.floor((passedTestCase / totalTestCase) * 100);
-//       if (percentPassed > 0) {
-//         //@ts-ignore
-//         setProblemssolved( problemssolved + 1); // Increment problemssolved by 1
-//         //@ts-ignore
-//         setScore( percentPassed); // Increment score based on percent passed
-//       }
-//     }
-//   },  [passedTestCase, totalTestCase, setProblemssolved, setScore]);
-
-//   const submitOnCorrect =async ()=>{
-//     var statusText="";
-//     if(passedTestCase===totalTestCase){
-//       setStatus("Accepted");
-//       statusText = "Accepted"
-//     }else if(passedTestCase.valueOf()!==totalTestCase.valueOf()){
-//       setStatus("WrongAnswer");
-//       statusText = "WrongAnswer"
-//     }else{
-//       setStatus("CompileError");
-//       statusText = "CompileError"
-
-//     }
-//     console.log("#########3",statusText)
-   
-//    try {
-//     const resp = await axios.put(`${FRONTEND_URL}/api/submissions`,{
-//       //@ts-ignore
-//       userId : session.data?.user.id,
-//       status : statusText,
-//       problemName : problemName
-//     });
-//     console.log("Success",resp.data)
-//    } catch (error) {
-//     return alert("Some error in submission tab")
-//    }
- 
-//   }
-//  useEffect(()=>{
-   
-//   if (type === "PROBLEM" && finish && passedTestCase===totalTestCase) {
-//     submitOnCorrect();
-//   }
-//  },[finish])
-
-//  console.log("--------->",status);
   return (
     <div className="flex items-center justify-center min-h-[50%] bg-white p-4 text-white">
+      
   <div className="w-full max-w-4xl bg-black shadow-md rounded-md p-4 flex flex-col lg:flex-row">
+  
     <div className="flex-grow lg:mr-8 mb-4 lg:mb-0">
       <div className="mb-4">
         <div className="font-bold">Time:</div>
@@ -125,15 +131,15 @@ const ShowTestCase = ({ output,testcase, testcaseans, problemName,setProblemssol
         <>
           <div className="mb-4">
             <div className="font-bold">Testcase:</div>
-            <div className="bg-gray-800 p-4 rounded-md">{errortestcase}</div>
+            <div className="bg-gray-800 p-4 rounded-md">{testcase[passedTestCase]}</div>
           </div>
           <div className="mb-4">
             <div className="font-bold">Correct Output:</div>
-            <div className="bg-gray-800 p-4 rounded-md">{correctOutput}</div>
+            <div className="bg-gray-800 p-4 rounded-md">{testcasesOutputgiven[passedTestCase]}</div>
           </div>
           <div className="mb-4">
             <div className="font-bold">Your Output:</div>
-            <div className="bg-gray-800 p-4 rounded-md">{outputtestcase}</div>
+            <div className="bg-gray-800 p-4 rounded-md">{yourOutput[passedTestCase]}</div>
           </div>
         </>
       ) : (
