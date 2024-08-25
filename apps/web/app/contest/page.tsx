@@ -1,7 +1,6 @@
 "use client"
 
 import React, { useEffect, useState } from 'react'
-import contest from "../../util/Contests.json";
 import ContestCard from '../../components/ContestCard';
 import axios from 'axios';
 import FRONTEND_URL from '../functions/frontendurl';
@@ -54,18 +53,6 @@ const Contest = () => {
   //@ts-ignore
 
 
-const formatDate = (dateStr:string) => {
-  const dateObj = new Date(dateStr);
-  return dateObj.toLocaleString('en-US', {
-    weekday: 'short',
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric',
-    hour: 'numeric',
-    minute: '2-digit',
-    hour12: true
-  });
-};
 
 // console.log(modContest)
 const topContests = contest &&  contest.slice(0, 4);

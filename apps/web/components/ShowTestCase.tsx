@@ -17,7 +17,7 @@ interface TestcaseInterface {
 function findScore(problemName:string,scoresArray:[]) {
   for (const obj of scoresArray) {
     //@ts-ignore
-      if (obj.hasOwnProperty(problemName)) {
+      if (Object.prototype.hasOwnProperty.call(obj, problemName)) {
           return obj[problemName];
       }
   }
@@ -46,7 +46,7 @@ function deepEqual(a, b) {
 
 
 
-const ShowTestCase = ({ output,testcase, testcaseans, problemName,setProblemssolved, problemssolved,score,setScore,type }: TestcaseInterface) => {
+const ShowTestCase = ({ output,testcase, testcaseans, problemName,setProblemssolved, problemssolved,setScore }: TestcaseInterface) => {
   const [passedTestCase, setPassedTestCase] = useState(0);
   const [totalTestCase, setTotalTestCase] = useState(0);
   const session = useSession();

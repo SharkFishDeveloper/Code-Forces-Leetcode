@@ -13,13 +13,6 @@ import { Session } from 'next-auth'
 import axios from 'axios'
 import FRONTEND_URL from '../../functions/frontendurl'
 
-interface ContestData {
-  user: string; // Assuming userId is a string
-  contest: string; // Placeholder, adjust as per your actual data structure
-  problemsSolved: number;
-  time: string; // Placeholder, adjust as per your actual data structure
-}
-
 
 const ContestRound = ({params}:{params:{id:string}}) => {
   const router = useRouter();
@@ -35,16 +28,11 @@ const ContestRound = ({params}:{params:{id:string}}) => {
     userId = session?.user?.id;
     // console.log(userId);
   }
-  const [contestData,setContestdata] = useState<ContestData>({ 
-    user: userId,
-    contest: params.id, // Initialize with appropriate initial value
-    problemsSolved: 0, // Initialize with appropriate initial value
-    time: '',});
     
     const [code, setCode] = useState<string>(localStorage?.getItem('userCode') || "");
     const [selectedLanguage, setSelectedLanguage] = useState<string>("C++");
     const [loading,setLoading] = useState(false);
-    const [runagain,setRunagain] = useState(false);
+    // const [runagain,setRunagain] = useState(false);
     let retryCount = 1;
     const maxRetries = 2;
 
@@ -56,7 +44,7 @@ const ContestRound = ({params}:{params:{id:string}}) => {
 
     const [cproblems,setcproblems] = useState<string[]|null>();
 
-    const [boilerplate,setBoilerplate] = useState<string[]>();
+    // const [boilerplate,setBoilerplate] = useState<string[]>();
     const [problemTitle,setproblemTitle] = useState<string>();
     const [problemScore,setproblemscore] = useState<{ problem: string; score: number }[]>([]);
     const [showMd,setShowmd] = useState<string|null>("");
@@ -188,7 +176,7 @@ const ContestRound = ({params}:{params:{id:string}}) => {
     
 
 
-    const fetchBoilerPlate = async ({title,language}:{title:string,language:string}) => {
+    const fetchBoilerPlate = async ({title}:{title:string,language:string}) => {
       try {
           const language = selectedLanguage === "C++" ? "cpp" :
               selectedLanguage === "Java" ? "java" :
@@ -270,7 +258,7 @@ async function onFinishTimer (){
   let allproblems = cproblems?.length;
   let userproblemsScore = 0;
 
-  const problems = problemScore.forEach((prob)=>{
+  problemScore.forEach((prob)=>{
     userproblemsScore+=prob.score;
     solvedProblems++;
   });
@@ -283,7 +271,7 @@ async function onFinishTimer (){
     await contestProblem(contestUserObj)
     alert(`Thank you for participating - Score ${userproblemsScore.toString()}`)
 
-    // router.replace("/");
+    router.replace("/");
   } catch (error) {
     alert("Some issue with submitting")
   };

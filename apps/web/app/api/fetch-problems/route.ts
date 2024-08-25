@@ -1,9 +1,9 @@
 "use server"
 
-import { NextRequest,NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import prisma from "../../../util/prismaDb";
 
-export async function GET(req:NextRequest) {
+export async function GET() {
     try {
         const data = await prisma.problems.findMany({
             take:10,

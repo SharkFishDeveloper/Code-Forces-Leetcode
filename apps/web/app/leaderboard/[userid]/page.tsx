@@ -51,11 +51,12 @@ const Leaderboard = ({ params }: { params: { userid:string } }) => {
   return (
     !show ? (
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {loading && (<p></p>)}
         <div className="text-center mb-4">
           <h2 className="text-2xl font-bold">Contest Ranks</h2>
         </div>
   
-        {loading ? (
+        {loading2 ? (
           <div className="text-center">Loading...</div>
         ) : data && data.data ? (
           <div>

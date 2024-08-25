@@ -33,13 +33,6 @@ try {
     userId:session.data?.user.id,
     problemName:problemName
     })
-    const reversedData = {
-        message: {
-          status: dataa.data.message.status.reverse(),
-          time: dataa.data.message.time.reverse(),
-          slug: dataa.data.message.slug // Keep slug as is
-        }
-      };
     setData({message:dataa.data.message}); //message is an array of time and status 
     console.log(dataa);
 } catch (error) {
