@@ -1,6 +1,5 @@
-import axios from 'axios';
+
 import React, { useEffect, useState } from 'react';
-import FRONTEND_URL from '../app/functions/frontendurl';
 import { useSession } from 'next-auth/react';
 
 interface TestcaseInterface {
@@ -14,6 +13,19 @@ interface TestcaseInterface {
   setScore:(n:number)=>void;
   type:string
 }
+
+function findScore(problemName:string,scoresArray:[]) {
+  for (const obj of scoresArray) {
+    //@ts-ignore
+      if (obj.hasOwnProperty(problemName)) {
+          return obj[problemName];
+      }
+  }
+  return null;
+}
+
+
+
 //@ts-ignore
 function deepEqual(a, b) {
   if (Array.isArray(a) && Array.isArray(b)) {
@@ -37,12 +49,7 @@ function deepEqual(a, b) {
 const ShowTestCase = ({ output,testcase, testcaseans, problemName,setProblemssolved, problemssolved,score,setScore,type }: TestcaseInterface) => {
   const [passedTestCase, setPassedTestCase] = useState(0);
   const [totalTestCase, setTotalTestCase] = useState(0);
-  // const [errortestcase,setErrortestcase] = useState(0);
-  // const [outputtestcase,setOutputtestcase] = useState<string|undefined>("");
-  // const [correctOutput,setCorrectoutput] = useState<string|null>("");
   const session = useSession();
-  const [status,setStatus] = useState("");
-  const [finish,setFinish] = useState(false);
 
 
   if(!session){
@@ -67,7 +74,7 @@ const ShowTestCase = ({ output,testcase, testcaseans, problemName,setProblemssol
   function compareLines() {
     let passedCount = 0;
     setTotalTestCase(testcase.length);
-     for (let index = 0; index < testcasesOutputgiven.length; index++) {
+    for (let index = 0; index < testcasesOutputgiven.length; index++) {
     const test = testcasesOutputgiven[index];
     const yourOutputValue = yourOutput[index];
     console.log("test",test,"yourOutput",yourOutputValue)
@@ -77,9 +84,9 @@ const ShowTestCase = ({ output,testcase, testcaseans, problemName,setProblemssol
         const check = deepEqual(yourOutputValue.replace(/\s+/g, ''),test.replace(/\s+/g, ''));
         if(check){
           passedCount += 1;
-          console.log("PASSED",yourOutput[index],test)
+          // console.log("PASSED",yourOutput[index],test)
         }else{
-          console.log("NOT PASSED",yourOutput[index],test)
+          // console.log("NOT PASSED",yourOutput[index],test)
           break;
         }
       } catch (error) {
@@ -96,11 +103,31 @@ useEffect(() => {
   }, [testcaseans]);
 
 
+  useEffect(() => {
+
+    if (setScore && setProblemssolved) {
+      const localStorageScore = localStorage.getItem("contest-scores");
+      const parsedScore = localStorageScore? JSON.parse(localStorageScore):null;
+      const fullScore = findScore(problemName,parsedScore);
+      if(!fullScore){
+          return alert("Please try again");
+      }
+      const percentPassed = Math.floor((passedTestCase / totalTestCase) * fullScore);
+      if (percentPassed > 0) {
+        //@ts-ignore
+        setProblemssolved( problemssolved + 1); // Increment problemssolved by 1
+        //@ts-ignore
+        setScore(percentPassed); // Increment score based on percent passed
+      }
+    }
+  },  [passedTestCase, totalTestCase, setProblemssolved, setScore]);
+
+
   return (
     <div className="flex items-center justify-center min-h-[50%] bg-white p-4 text-white">
       
   <div className="w-full max-w-4xl bg-black shadow-md rounded-md p-4 flex flex-col lg:flex-row">
-  
+  <p>{problemssolved}</p>
     <div className="flex-grow lg:mr-8 mb-4 lg:mb-0">
       <div className="mb-4">
         <div className="font-bold">Time:</div>

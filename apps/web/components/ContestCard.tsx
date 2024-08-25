@@ -29,6 +29,12 @@ const ContestCard= ({ name, problems,dateProblem,score }:{ name:string, problems
         hour12: true // Display in 12-hour format
     });
 
+    const convertProblemsAndScoresToArray = (problems:string[], score:string[]) => {
+        return problems.map((problem:string, index:number) => ({
+            [problem]: score[index]
+        }));
+    };
+
     return (
         <div className="h-[13rem] max-w-sm rounded-xl overflow-hidden shadow-lg bg-white m-4 transition duration-300 ease-in-out transform hover:scale-105 cursor-pointer hover:bg-gray-100 flex flex-col justify-between">
             <div className="px-6 py-7">

@@ -33,7 +33,7 @@ const ContestRound = ({params}:{params:{id:string}}) => {
   if(session?.user?.id){
     //@ts-ignore
     userId = session?.user?.id;
-    console.log(userId);
+    // console.log(userId);
   }
   const [contestData,setContestdata] = useState<ContestData>({ 
     user: userId,
@@ -67,35 +67,35 @@ const ContestRound = ({params}:{params:{id:string}}) => {
 
 
     const addProblemScore = () => {
-
       const existingProblemIndex = problemScore.findIndex(item => item.problem === problemTitle);
-      console.log("EXISTING ,",existingProblemIndex)
       //@ts-ignore
       if (existingProblemIndex !== -1) {
          //@ts-ignore
       if(problemScore[existingProblemIndex]){
          //@ts-ignore
-      if (score > problemScore[existingProblemIndex].score) {
-      setproblemscore(prev => {
-        const updatedProblemScore = [...prev];
-        updatedProblemScore[existingProblemIndex] = { problem: problemTitle as string, score: score };
-        return updatedProblemScore;
-      });
-    }
-  } 
+            if (score > problemScore[existingProblemIndex].score )  {
+            setproblemscore(prev => {
+              const updatedProblemScore = [...prev];
+              updatedProblemScore[existingProblemIndex] = { problem: problemTitle as string, score:score };
+              return updatedProblemScore;
+               });
+            }
+          } 
         }
         else {
-          console.log("RUNNING ELSE")
-           setproblemscore(prev => [...prev, { problem: problemTitle as string, score: score }]);
+          setproblemscore(prev=>[
+            ...prev,
+            {problem: problemTitle as string,score}
+          ])
         }
     };
+
+    console.log("setproblemscore",problemScore)
     
   
   
 
     useEffect(()=>{
-      console.log("useEffect triggered with problemssolved:", problemssolved);
-      console.log("useEffect triggered with score:", score);
       if (score > 0) {
         addProblemScore();
       }
@@ -124,20 +124,16 @@ const ContestRound = ({params}:{params:{id:string}}) => {
           }
          } catch (error) {
           console.log(error)
-          // return alert("Someth sing bad happened");
          }finally{
           setLoading(false);
          }
       }
       findMd();
-      console.log("I ran");
-      console.log(selectedLanguage);
       
   },[problemTitle]);
 
 
     useEffect(() => {
-      // Scroll to ref if showtestcase changes
       if (showtestcase && scrollRef.current) {
         scrollRef.current.scrollIntoView({ behavior: 'smooth' });
       }
@@ -152,16 +148,22 @@ const ContestRound = ({params}:{params:{id:string}}) => {
       const getProblems = () => {
         const problems = localStorage.getItem('contest-problems');
         const score = localStorage.getItem('contest-score');
-        setproblemscore(score && JSON.parse(score));
-        if (problems) {
+
+        // setproblemscore(score && JSON.parse(score));
+        if (problems && score) {
           setcproblems(JSON.parse(problems));
+          localStorage.setItem('contest-scores', JSON.stringify(convertProblemsAndScoresToArray(JSON.parse(problems),JSON.parse(score))));
+          console.log(problems,score)
         }
-        console.log("PROBLEMS",problems && JSON.parse(problems))
       };
       getProblems();
     }, []);
   
-
+    const convertProblemsAndScoresToArray = (problems:string[], score:string[]) => {
+      return problems.map((problem:string, index:number) => ({
+          [problem]: score[index]
+      }));
+    };
 
 
     useEffect(() => {
@@ -178,7 +180,7 @@ const ContestRound = ({params}:{params:{id:string}}) => {
 
 
     useEffect(() => {
-      console.log("CHANGING LANGUAGE ",selectedLanguage,problemTitle);
+      // console.log("CHANGING LANGUAGE ",selectedLanguage,problemTitle);
       if (problemTitle) {
         fetchBoilerPlate({ title: problemTitle,language:selectedLanguage });
       }
@@ -197,8 +199,6 @@ const ContestRound = ({params}:{params:{id:string}}) => {
               const bpCode = await axios.post(`${FRONTEND_URL}/api/problems-boilerplate`,{slug:title,language:language});
               setCode(bpCode.data.message.boilerplateHalf);
               setFullCode(bpCode.data.message.boilerplateFull);
-              // let test = JSON.parse(bpCode.data.message.test_cases);
-              // setTestcase(test);
           console.log(bpCode)
       } catch (error) {
           alert("An error occurred");
@@ -217,7 +217,6 @@ const ContestRound = ({params}:{params:{id:string}}) => {
     
 
 async function checkTestCases() {
-      console.log(code)
       setShowtestcase(true);
   }
 
@@ -234,7 +233,6 @@ async function checkTestCases() {
         }
         else{
              final_user_code = fullcode.replace("###USER_CODE_HERE", code);
-             console.log(final_user_code)
         }
         setLoading(true);
         try {
@@ -252,12 +250,10 @@ async function checkTestCases() {
                 retryCount = 0;
                 return;
             } else if (resp?.result.run.output!==undefined) {
-              console.log(resp?.result.run.output)
               setOutput(resp?.result.run.output);
             }
              await checkTestCases();
         } catch (error) {
-            // console.log("over")
             return alert(error);
         } finally {
             setLoading(false);
@@ -273,6 +269,7 @@ async function onFinishTimer (){
   let solvedProblems = 0;
   let allproblems = cproblems?.length;
   let userproblemsScore = 0;
+
   const problems = problemScore.forEach((prob)=>{
     userproblemsScore+=prob.score;
     solvedProblems++;
@@ -284,8 +281,9 @@ async function onFinishTimer (){
 
   try {
     await contestProblem(contestUserObj)
-    alert("Thank you for participating")
-    router.replace("/");
+    alert(`Thank you for participating - Score ${userproblemsScore.toString()}`)
+
+    // router.replace("/");
   } catch (error) {
     alert("Some issue with submitting")
   };
@@ -302,13 +300,12 @@ async function onFinishTimer (){
     <div className="">
          <div className=" text-center">
       Score - {score }
-
+    <p>{localStorage.getItem('contest-score')}</p>
         <div className="text-lg font-bold flex justify-between p-3">
         <p className="font-bold text-2xl">Welcome to round - {params.id}</p>
 
         <div className="flex flex-col justify-star items-start">
         <span className="underline-offset-2 underline cursor-pointer hover:text-gray-700" onClick={()=>onFinishTimer()}>Submit test</span>
-        {/* <span className="text-[0.5rem]">Click only when you are done</span> */}
         </div>
         </div>
         <div className="flex justify-center"><Timer  initialTime={7200} onFinish={() => onFinishTimer()}  onTick={handleTimerTick}/>
@@ -335,7 +332,7 @@ async function onFinishTimer (){
     ) : (
       <div className="text-center">Loading problem...</div>
     )}
-            </div>
+   </div>
             
         
       <div className="flex flex-col lg:flex-row lg:space-x-4">
@@ -349,7 +346,10 @@ async function onFinishTimer (){
     </div>
     {showtestcase && (
              //@ts-ignore
-            <ShowTestCase output={output} testcaseans={testcaseans} testcase={testcase} problemName={params.id} type="CONTEST" />)}
+            <ShowTestCase output={output} testcaseans={testcaseans} testcase={testcase} problemName={problemTitle} type="CONTEST" 
+            setProblemssolved={setProblemssolved} problemssolved={problemssolved}
+            score={score} setScore={setScore}
+            />)}
     </div>
   )
 }

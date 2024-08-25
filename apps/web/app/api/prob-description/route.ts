@@ -17,7 +17,6 @@ export async function POST(req:NextRequest){
         test_cases_ans:true,
         // boilerplateCppFull:true
         }});
-        console.log("$$$$$$$$$$$$$$$$$$$$$",problems?.description,problems?.test_cases,problems?.test_cases_ans);
         return  NextResponse.json({message:{
             description:problems?.description,
             test_cases:problems?.test_cases,
