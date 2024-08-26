@@ -48,11 +48,11 @@ export async function POST(req:NextRequest){
 
 
 
-        // return  NextResponse.json({message:{
-        //     description:problems?.description,
-        //     test_cases:problems?.test_cases,
-        //     test_cases_ans:problems?.test_cases_ans
-        // }},{status:200})
+        return  NextResponse.json({message:{
+            description:problems?.description,
+            test_cases:problems?.test_cases,
+            test_cases_ans:problems?.test_cases_ans
+        }},{status:200})
     } catch (error) {
         return  NextResponse.json({error:error},{status:400})
     }finally{

@@ -105,7 +105,7 @@ const ShowTestCase = ({ output,testcase, testcaseans, problemName,setProblemssol
     try {
       //@ts-ignore
       console.log("userId",session.data?.user.id)
-      const res = await axios.put(`${FRONTEND_URL}/api/submissions`,{
+      await axios.put(`${FRONTEND_URL}/api/submissions`,{
         //@ts-ignore
         userId:session.data?.user.id,
         status:"Accepted",
@@ -140,7 +140,6 @@ const ShowTestCase = ({ output,testcase, testcaseans, problemName,setProblemssol
     }
   },  [passedTestCase, totalTestCase, setProblemssolved, setScore]);
 
-
   return (
     <div className="flex items-center justify-center min-h-[50%] bg-white p-4 text-white">
       
@@ -163,11 +162,11 @@ const ShowTestCase = ({ output,testcase, testcaseans, problemName,setProblemssol
       </div>
       <div className="mb-4">
         <div className="font-bold">Total Submissions:</div>
-        <div>totalSubmissions</div>
+        <div>-</div>
       </div>
       <div>
         <div className="font-bold">Pass Percentage:</div>
-        <div>passPercentage%</div>
+        <div>-</div>
       </div>
     </div>
 
@@ -184,7 +183,9 @@ const ShowTestCase = ({ output,testcase, testcaseans, problemName,setProblemssol
           </div>
           <div className="mb-4">
             <div className="font-bold">Your Output:</div>
-            <div className="bg-gray-800 p-4 rounded-md">{yourOutput[passedTestCase]}</div>
+                  <div className="bg-gray-800 p-4 rounded-md"> {yourOutput && yourOutput[passedTestCase] && yourOutput[passedTestCase].length < 450
+          ? yourOutput[passedTestCase]
+          : ""}</div>
           </div>
         </>
       ) : (

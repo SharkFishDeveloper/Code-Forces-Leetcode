@@ -34,7 +34,7 @@ export async function POST(req:NextRequest){
                 test_cases_ans
             }},{status:200})
           }else{
-            console.log("NOT HIT +++++")
+            console.log("")
           }
 
         prisma.$connect();

@@ -155,10 +155,10 @@ def main():
           // Assuming `test` is a string that needs to be split by space
         const splitTest = test.split(" "); // Split test string into individual elements
   
-          return `
-      result_${index + 1} = ${this.problem}(${splitTest.map((t: any) => `${t}`).join(', ')})
-          print(result_${index + 1})`;
-      }).join('\n    ')}
+    return `
+    result_${index + 1} = ${this.problem}(${splitTest.map((t: any) => `${t}`).join(', ')})
+    print(result_${index + 1})`;
+}).join('\n    ')}
   
 if __name__ == "__main__":
     main()

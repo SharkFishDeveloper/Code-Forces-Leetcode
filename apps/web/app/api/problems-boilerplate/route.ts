@@ -56,7 +56,7 @@ export async function POST(req: NextRequest) {
                 }
             }, { status: 200 })
         }
-       //@ts-ignore
+    //    @ts-ignore
        
        let parsedcachedData = cachedData ?  JSON.parse(cachedData):null;
         console.log("NOT HIT")
@@ -80,5 +80,6 @@ export async function POST(req: NextRequest) {
     catch (error) {
         return NextResponse.json({ error: error }, { status: 404 })
     } finally {
+        console.log("")
     }
 }

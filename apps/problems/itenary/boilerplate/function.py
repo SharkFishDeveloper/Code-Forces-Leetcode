@@ -1,4 +1,3 @@
-//Add imports here 
-    def findItinerary(tickets):
+def findItinerary(tickets):
         # Your code
-        return result
+    return result

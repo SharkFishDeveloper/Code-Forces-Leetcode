@@ -118,7 +118,8 @@ const Problem = ({ params }: { params: { id: string, title: string, path: string
             final_user_code = `${importsText}${finalCodeWithoutImports}`
         }
         else{
-             final_user_code = fullcode.replace("###USER_CODE_HERE", code);
+            final_user_code = fullcode.replace("###USER_CODE_HERE", code);
+            console.log(final_user_code)
         }
         setLoading(true);
         try {
@@ -152,8 +153,8 @@ const Problem = ({ params }: { params: { id: string, title: string, path: string
 
     return (
         <div>
-            <div className="flex flex-col lg:flex-row">
-            <div className="w-full lg:w-[50%] h-[54rem] bg-black">
+            <div className="flex flex-col lg:flex-row ">
+            <div className="w-full lg:w-[50%]  bg-black h-[80%]">
                 <MarkdownProblem content={showMd as string} />
             </div>
             <div className="w-full lg:w-[50%] mt-4 lg:mt-0 lg:ml-4">
