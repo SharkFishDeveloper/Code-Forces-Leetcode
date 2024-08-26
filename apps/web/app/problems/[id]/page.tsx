@@ -48,7 +48,7 @@ const Problem = ({ params }: { params: { id: string, title: string, path: string
             setFullCode(resp.data.message.boilerplatefullcode);
             setTestcase(resp.data.message.test_cases);
             setTest_case_ans(resp.data.message.test_cases_ans);
-            console.log("TESTCASES_ANSWERS=>",resp.data.message.test_cases_ans);
+            // console.log("TESTCASES_ANSWERS=>",resp.data.message.test_cases_ans);
             }
             else if(resp.status===400){
                 return alert("Something bad happened");
@@ -80,8 +80,9 @@ const Problem = ({ params }: { params: { id: string, title: string, path: string
                     }
                     try {
                     const resp = await axios.post(`${FRONTEND_URL}/api/problems-boilerplate`,{slug:params.id,language:language});
-                    setCode(resp.data.message.boilerplateHalf);
-                    setFullCode(resp.data.message.boilerplateFull);
+                    setCode(resp.data.message.boilerplateHalf || resp.data.message.responseObject.boilerplateHalf);
+                    console.log("Boilerplate",resp.data.message.boilerplateHalf || resp.data.message.responseObject.boilerplateHalf)
+                    setFullCode(resp.data.message.boilerplateFull || resp.data.message.responseObject.boilerplateFull);
                     } catch (error) {
                     return alert("Error in fetching boilerlplate");
                     }
@@ -119,7 +120,6 @@ const Problem = ({ params }: { params: { id: string, title: string, path: string
         else{
              final_user_code = fullcode.replace("###USER_CODE_HERE", code);
         }
-        console.log("final_user_code",final_user_code)
         setLoading(true);
         try {
             const Language = selectedLanguage.toLowerCase();
@@ -148,8 +148,6 @@ const Problem = ({ params }: { params: { id: string, title: string, path: string
     async function checkTestCases() {
       setShowtestcase(true);
     }
-
-    console.log("rnning")
 
 
     return (
@@ -186,14 +184,6 @@ const Problem = ({ params }: { params: { id: string, title: string, path: string
 
             </div>
         </div>
-
-        {/* {testcaseans && output && (
-            <div>
-                <p>TESTCASE - {testcase}</p>
-                <p>GIVEN ANS - {testcaseans}</p>
-                <p>OUTPUT - {output}</p>
-            </div>
-        )} */}
         {showtestcase && (
              //@ts-ignore
             <ShowTestCase output={output} testcaseans={testcaseans} testcase={testcase} problemName={params.id} type="PROBLEM" />)}

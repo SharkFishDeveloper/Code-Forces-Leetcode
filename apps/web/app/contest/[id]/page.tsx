@@ -12,6 +12,7 @@ import { useRouter } from 'next/navigation'
 import { Session } from 'next-auth'
 import axios from 'axios'
 import FRONTEND_URL from '../../functions/frontendurl'
+import toast from 'react-hot-toast'
 
 
 const ContestRound = ({params}:{params:{id:string}}) => {
@@ -44,13 +45,28 @@ const ContestRound = ({params}:{params:{id:string}}) => {
 
     const [cproblems,setcproblems] = useState<string[]|null>();
 
-    // const [boilerplate,setBoilerplate] = useState<string[]>();
     const [problemTitle,setproblemTitle] = useState<string>();
     const [problemScore,setproblemscore] = useState<{ problem: string; score: number }[]>([]);
     const [showMd,setShowmd] = useState<string|null>("");
 
 
     const [testcaseans,setTest_case_ans] = useState("");
+    const [timeleft, setTimeLeft] = useState<number>(() => {
+    const time = localStorage.getItem("contest-time");
+    if (time) {
+      const startingTime = new Date(time as string);
+      startingTime.setHours(startingTime.getHours() - 5);
+      startingTime.setMinutes(startingTime.getMinutes() - 30);
+
+      const currentTime = new Date();
+      const timeDiff = currentTime.getTime() - startingTime.getTime();
+      let timeSeconds = (7200000 - timeDiff) / 1000;      
+      timeSeconds = Math.floor(timeSeconds);
+      return timeSeconds > 0 ? timeSeconds : 0;
+    }
+    // Default value if no contest-time is found in localStorage
+    return 7200; 
+  });
 
 
 
@@ -78,9 +94,6 @@ const ContestRound = ({params}:{params:{id:string}}) => {
         }
     };
 
-    console.log("setproblemscore",problemScore)
-    
-  
   
 
     useEffect(()=>{
@@ -101,15 +114,16 @@ const ContestRound = ({params}:{params:{id:string}}) => {
       const findMd = async()=>{
          try {
           const resp = await axios.post(`${FRONTEND_URL}/api/prob-description`,{slug:problemTitle});
+          console.log("IN CONTEST prob-des",resp.data)
           if(resp.status === 200){
             setShowmd(resp.data.message.description);
             setTest_case_ans(resp.data.message.test_cases_ans);
             setTestcase(resp.data.message.test_cases);
-            console.log(resp.data.message.test_cases_ans);
           }
           else if(resp.status === 400){
             return alert("Something bad happened");
           }
+         
          } catch (error) {
           console.log(error)
          }finally{
@@ -185,9 +199,13 @@ const ContestRound = ({params}:{params:{id:string}}) => {
               selectedLanguage === "Rust" ? "rs" :
               "";
               const bpCode = await axios.post(`${FRONTEND_URL}/api/problems-boilerplate`,{slug:title,language:language});
-              setCode(bpCode.data.message.boilerplateHalf);
-              setFullCode(bpCode.data.message.boilerplateFull);
-          console.log(bpCode)
+              console.log("IN CONTEST problems-boilerplate",bpCode.data)
+              setCode(bpCode.data.message.boilerplateHalf || bpCode.data.message.
+                responseObject.boilerplateHalf);
+              setFullCode(bpCode.data.message.boilerplateFull || bpCode.data.message.responseObject.boilerplateFull
+              );
+
+          // console.log(bpCode)
       } catch (error) {
           alert("An error occurred");
       }
@@ -269,7 +287,7 @@ async function onFinishTimer (){
 
   try {
     await contestProblem(contestUserObj)
-    alert(`Thank you for participating - Score ${userproblemsScore.toString()}`)
+    toast.success(`Thank you for participating`)
 
     router.replace("/");
   } catch (error) {
@@ -292,11 +310,12 @@ async function onFinishTimer (){
         <div className="text-lg font-bold flex justify-between p-3">
         <p className="font-bold text-2xl">Welcome to round - {params.id}</p>
 
-        <div className="flex flex-col justify-star items-start">
-        <span className="underline-offset-2 underline cursor-pointer hover:text-gray-700" onClick={()=>onFinishTimer()}>Submit test</span>
+        <div className="flex flex-col justify-center items-center text-sm h-[3rem] bg-gray-50 hover:bg-gray-200 w-[5rem] rounded-md">
+        <span className=" cursor-pointer  " onClick={()=>onFinishTimer()}>Finish</span>
         </div>
         </div>
-        <div className="flex justify-center"><Timer  initialTime={7200} onFinish={() => onFinishTimer()}  onTick={handleTimerTick}/>
+        <div className="flex justify-center">
+          <Timer  initialTime={timeleft} onFinish={() => onFinishTimer()}  onTick={handleTimerTick}/>
         </div>
         </div>
         <div className="flex ">

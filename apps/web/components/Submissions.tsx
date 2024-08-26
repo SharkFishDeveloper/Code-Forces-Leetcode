@@ -29,18 +29,20 @@ useEffect(()=>{
 const resp =async ()=>{
 try {
     const dataa = await axios.post(`${FRONTEND_URL}/api/submissions`,{
-        //@ts-ignore
+        // @ts-ignore
     userId:session.data?.user.id,
     problemName:problemName
     })
-    setData({message:dataa.data.message}); //message is an array of time and status 
+    console.log("dataa",dataa,problemName)
+    if(dataa.data.message){
+      setData({message:dataa.data.message}); //message is an array of time and 
+    } 
     console.log(dataa);
 } catch (error) {
     console.log(error);
     return alert("Problem in submissions tab");
 }
 }
-// a61351f4-7ef5-40c7-904f-5f4e606aab52
 resp();
 },[])
 
@@ -51,7 +53,7 @@ return (
         
         <div className="mb-4">
           <p className="text-sm text-gray-600">Problem Name:</p>
-          <p className="text-lg font-semibold">{data?.message.slug.toUpperCase()}</p>
+          <p className="text-lg font-semibold">{data?.message && data?.message.slug.toUpperCase()}</p>
         </div>
         
         <div>

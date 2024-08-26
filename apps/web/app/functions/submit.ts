@@ -26,8 +26,6 @@ async function Submit({code,selectedLanguage}) {
             message: "Code executed successfully",
             result: resp.data.result
         };
-        // return Response.json({message:"Code executed successfully",result:resp.data.result})
-        // await redis.hSet(submitReq.userId,{"code":submitReq.code,"language":submitReq.selectedLanguage}); 
 
     } catch (error) {
         

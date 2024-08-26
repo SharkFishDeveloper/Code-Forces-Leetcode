@@ -13,7 +13,7 @@ const fetchMdAndCppBoilerplate = async (slug: string) => {
         // boilerplateCppHalf: true,
       },
     });
-    const plainResp = JSON.parse(JSON.stringify(resp));
+    // const plainResp = JSON.parse(JSON.stringify(resp));
     console.log(resp);
     if (!resp) {
       return { error: "Problem not found", status: "404" };

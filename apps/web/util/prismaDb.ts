@@ -1,7 +1,6 @@
 
 
 import { PrismaClient } from "@prisma/client";
-// import Prisma from "@repo/db"
 
 const prismaClientSingleton = () => {
   return new PrismaClient();

@@ -1,6 +1,8 @@
 
 import React, { useEffect, useState } from 'react';
 import { useSession } from 'next-auth/react';
+import axios from 'axios';
+import FRONTEND_URL from '../app/functions/frontendurl';
 
 interface TestcaseInterface {
   output: any;
@@ -84,9 +86,7 @@ const ShowTestCase = ({ output,testcase, testcaseans, problemName,setProblemssol
         const check = deepEqual(yourOutputValue.replace(/\s+/g, ''),test.replace(/\s+/g, ''));
         if(check){
           passedCount += 1;
-          // console.log("PASSED",yourOutput[index],test)
         }else{
-          // console.log("NOT PASSED",yourOutput[index],test)
           break;
         }
       } catch (error) {
@@ -94,11 +94,29 @@ const ShowTestCase = ({ output,testcase, testcaseans, problemName,setProblemssol
       }
      
       setPassedTestCase(passedCount);
-
     };
+    if(!setScore && passedCount === testcase.length){
+      setSubmission()
+      console.log("YOU PASSED ALL TEST CASES",passedCount,testcase.length)
+    }
   }
 
-useEffect(() => {
+  const setSubmission = async()=>{
+    try {
+      //@ts-ignore
+      console.log("userId",session.data?.user.id)
+      const res = await axios.put(`${FRONTEND_URL}/api/submissions`,{
+        //@ts-ignore
+        userId:session.data?.user.id,
+        status:"Accepted",
+        problemName
+      });
+    } catch (error) {
+      console.log("Cannot do it")
+    }
+  }
+
+  useEffect(() => {
     compareLines();
   }, [testcaseans]);
 

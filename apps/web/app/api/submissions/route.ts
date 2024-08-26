@@ -10,7 +10,7 @@ export async function PUT(req:NextRequest) {
     if(!status){
         return NextResponse.json({message:"No status"})
     }
-    console.log("#############",userId,status,problemName)
+    // console.log("#############",userId,status,problemName)
     const dataPrisma = await prisma.submissionsProblem.findUnique({
         where:{
             userId:userId,
@@ -25,8 +25,8 @@ export async function PUT(req:NextRequest) {
     if(!dataPrisma){
         console.log("NO USER IN DB")
     }
-    const ISTDate = new Date(new Date().valueOf() + 5.5 * 60 * 60 * 1000);
-    const user = await prisma.user.update({
+    const ISTDate = new Date(new Date().valueOf());
+    await prisma.user.update({
         where:{
             id:userId
         },
@@ -50,7 +50,7 @@ export async function PUT(req:NextRequest) {
             }
         }
     })
-    console.log("SFfs")
+    // console.log("SFfs")
     return NextResponse.json({message:"Created"})
     }
     catch (error) {
@@ -61,9 +61,9 @@ export async function PUT(req:NextRequest) {
 
 export async function POST(req:NextRequest) {
     try {
-        // await prisma.$connect();
+        await prisma.$connect();
         const {userId,problemName} = await req.json()
-        console.log("USER ID",userId)
+        console.log("USER ID",userId,problemName)
         const resp = await prisma.submissionsProblem.findUnique({
             where:{
                 userId:userId,
@@ -77,8 +77,11 @@ export async function POST(req:NextRequest) {
             }
             
         })
+        console.log(resp)
         return NextResponse.json({userId,message:resp});
     } catch (error) {
         return NextResponse.json({message:error},{status:400});
+    }finally{
+        await prisma.$disconnect();
     }
 }

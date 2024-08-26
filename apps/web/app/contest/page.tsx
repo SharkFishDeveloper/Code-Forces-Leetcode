@@ -5,18 +5,6 @@ import ContestCard from '../../components/ContestCard';
 import axios from 'axios';
 import FRONTEND_URL from '../functions/frontendurl';
 
-// {
-//   "name": "A1",
-//   "problemsId": [
-//     "add",
-//     "binarysearch"
-//   ],
-//   "score": [
-//     "100",
-//     "350"
-//   ],
-//   "startTime": "2024-07-18T08:30:00.000Z"
-// }
 
 const Contest = () => {
   const [loading,setLoading] = useState(false);
@@ -70,6 +58,7 @@ const topContests = contest &&  contest.slice(0, 4);
                                 problems={c.problemsId}
                                 dateProblem={c.startTime}
                                 score={c.score}
+                                startingTime = {c.startTime}
                                  />
                             ))}
                         </div> 

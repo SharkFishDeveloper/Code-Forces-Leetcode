@@ -5,10 +5,11 @@ import Image from 'next/image';
 import Link from 'next/link';
 import userIcon from "../util/images/user.png";
 import { useRouter } from 'next/navigation';
+import toast from 'react-hot-toast';
 
 const AppBar = () => {
   const router = useRouter();
-  const { data: session } = useSession();
+  const { data: session } =  useSession();
   const [openProfile, setOpenProfile] = useState(false);
 
   const handleSignOut = async () => {
@@ -26,12 +27,30 @@ const AppBar = () => {
 
       {/* Navigation Links */}
       <div className="hidden md:flex space-x-4">
-        <Link href="/contest" >
-          <span className="font-semibold hover:text-gray-300">Contest</span>
-        </Link>
-        <Link href="/problems">
-          <span className="font-semibold hover:text-gray-300">Problems</span>
-        </Link>
+      {typeof session !== 'undefined' ? (
+        session?.user ? (
+          <Link href="/contest" >
+            <span className="font-semibold hover:text-gray-300">Contest</span>
+          </Link>
+          ) : (
+          <p className="font-semibold hover:text-gray-300 cursor-pointer" onClick={()=>{
+            toast.error("Please login first")
+            }}>Contest</p>
+          )
+        ) : (
+          <p>Loading...</p>
+      )}
+
+        {
+          session?.user ? (
+            <Link href="/problems" >
+            <span className="font-semibold hover:text-gray-300">Problems</span>
+            </Link>
+          ):<p className="font-semibold hover:text-gray-300 cursor-pointer" onClick={()=>{
+            toast.error("Please login first")
+          }}>Problems</p>
+        }
+
        {session?.user && (
         //@ts-ignore
          <Link href={`/leaderboard/${session?.user?.id}`} >

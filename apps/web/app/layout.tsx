@@ -3,6 +3,7 @@ import localFont from "next/font/local";
 import "./globals.css";
 import { Providers } from "../util/provider";
 import Appbar from "../components/Appbar";
+import { Toaster } from "react-hot-toast";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -27,19 +28,16 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-          <Providers>
+        <Providers>
+        <html lang="en">
         <body className={`${geistSans.variable} ${geistMono.variable}`}>
-            
-        {/* <div className="h-[100%] w-[100%]"> */}
+        <Toaster/>
         <Appbar/>
-        <div style={{ overflowX: 'hidden' }}>
-            {/* Adjust max-width and other styles as needed */}
+          <div style={{ overflowX: 'hidden' }}>
             {children}
           </div>
-        {/* </div> */}
-      </body>
+        </body>
+      </html>
           </Providers>
-    </html>
   );
 }
