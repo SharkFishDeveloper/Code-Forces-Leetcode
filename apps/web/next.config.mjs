@@ -4,5 +4,3 @@ const nextConfig = {
         domains: ['avatars.githubusercontent.com',"lh3.googleusercontent.com"], // Add or remove hostnames as needed
       },
 };
-
-export default nextConfig;
