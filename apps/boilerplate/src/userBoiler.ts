@@ -78,12 +78,11 @@ export class ProblemDefinitionParser{
         // console.log(input); // Assuming you're using console.log for debugging purposes
  
     const pythonCode = `
-//Add imports here 
-    def ${this.functionName}(${input}):
+def ${this.functionName}(${input}):
         # Your code
-        return ${this.outputFields[0].name}
+    return ${this.outputFields[0].name}
     `;
-        return pythonCode.trim(); // Trim to remove any leading/trailing whitespace
+    return pythonCode.trim(); // Trim to remove any leading/trailing whitespace
     }
     
 

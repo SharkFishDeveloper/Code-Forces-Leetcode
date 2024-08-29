@@ -1,11 +1,12 @@
-
+import { PrismaClient } from "@prisma/client";
 import readline from "readline";
 import fs from "fs";
 import path from "path";
 import { PROBLEM_PATH } from "./util/path";
 import { ProblemDefinitionParser } from "./userBoiler";
 import { FullBoilerplate } from "./fullboilerplate";
-
+const prisma = new PrismaClient();
+prisma.$connect();
 
 const rl = readline.createInterface({
     input: process.stdin,
@@ -17,6 +18,7 @@ function generateBoilerPlate(problem:string,difficulty:string){
     const inputpath       = path.join(__dirname,PROBLEM_PATH,problem,"Structure.md");
     const boilerplatepath = path.join(__dirname,PROBLEM_PATH,problem,"boilerplate");
     const fullBoilerplate = path.join(__dirname,PROBLEM_PATH,problem,"full-boilerplate");
+    
     
         if ((!fs.existsSync(path.join(__dirname,PROBLEM_PATH,problem)))) {
             console.log("No such problem !!");
@@ -39,7 +41,7 @@ function generateBoilerPlate(problem:string,difficulty:string){
         }
     }
 
-function processInputFiles(problem: string,difficulty:string,inputpath:string, boilerplatepath: string, fullBoilerplate: string) {
+async function processInputFiles(problem: string,difficulty:string,inputpath:string, boilerplatepath: string, fullBoilerplate: string) {
     const fileContent = fs.readFileSync(inputpath,'utf-8');
     if(fileContent===""){
         return console.log("Empty structure.md file !!")
@@ -51,14 +53,23 @@ function processInputFiles(problem: string,difficulty:string,inputpath:string, b
     const javaCode = partialParser.functionJava();
     const pythonCode = partialParser.functionPython();
     const rustCode = partialParser.functionRust();
+
+    const problemReadme =  path.join(__dirname,PROBLEM_PATH,problem,"Problem.md");
     if(!fs.existsSync(boilerplatepath)){
         fs.mkdirSync(boilerplatepath,{recursive:true})
     }
-    fs.writeFileSync(path.join(boilerplatepath,"function.cpp"),cppCode);
-    fs.writeFileSync(path.join(boilerplatepath,"function.js"),jsCode);
-    fs.writeFileSync(path.join(boilerplatepath,"function.java"),javaCode);
-    fs.writeFileSync(path.join(boilerplatepath,"function.py"),pythonCode);
-    fs.writeFileSync(path.join(boilerplatepath,"function.rs"),rustCode);
+    let readmeData = "";
+    if(!fs.existsSync(problemReadme)){
+        fs.writeFileSync(problemReadme,"");
+        // fs.mkdirSync(boilerplatepath,{recursive:true})
+        return console.log("Fill Problem.md file")
+    }
+    readmeData = fs.readFileSync(problemReadme,"utf-8");
+    // fs.writeFileSync(path.join(boilerplatepath,"function.cpp"),cppCode);
+    // fs.writeFileSync(path.join(boilerplatepath,"function.js"),jsCode);
+    // fs.writeFileSync(path.join(boilerplatepath,"function.java"),javaCode);
+    // fs.writeFileSync(path.join(boilerplatepath,"function.py"),pythonCode);
+    // fs.writeFileSync(path.join(boilerplatepath,"function.rs"),rustCode);
     console.log("Boilerplate code generated successfully!");
     const inputFields = partialParser.inputFields;
     const outputFields = partialParser.outputFields;
@@ -68,41 +79,156 @@ function processInputFiles(problem: string,difficulty:string,inputpath:string, b
     const data = fs.readFileSync(path.join(__dirname, '../../web/util/Problems.json'),"utf-8");
     let problems:{title:string,path:string,level:string}[] = JSON.parse(data);
     const existsProb = problems.some((problemQ:any)=>problemQ.title===problem);
+    let difficultyLevel=difficulty === "e"?"easy":difficulty === "m"?"medium":difficulty === "h"?"hard":"u";
     if(!existsProb){
-        const difficultyLevel = difficulty === "e"?"easy":difficulty === "m"?"medium":difficulty === "h"?"hard":"u";
+         difficultyLevel = difficulty === "e"?"easy":difficulty === "m"?"medium":difficulty === "h"?"hard":"u";
         problems.push({title:problem,path:`../../problems/${problem}`,level:difficultyLevel});
         fs.writeFileSync((path.join(__dirname, '../../web/util/Problems.json')), JSON.stringify(problems, null, 2));
     }
-    
-    // console.log("data",problems);
-
 //!
 
     const fullBoiler = new FullBoilerplate(cppCode,javaCode,problem,inputFields,outputFields,functionName);
+    let test_case:any = fullBoiler.testcases;
 
+    // test_case = JSON.stringify(test_case);
+
+    let test_case_ans:any = fullBoiler.testcases_ans;
+    // let test_case_ans1 = JSON.stringify(test_case_ans);
+    // console.log("ANS=>",test_case_ans);
+    
     const fcppCode = fullBoiler.generateCpp();
     const fjavaCode = fullBoiler.generateJava();
-    console.log(fcppCode)
+    console.log(fjavaCode);
     const fpythonCode = fullBoiler.generatePython();
     const fjsCode = fullBoiler.generateJs();
-    const frustCode = fullBoiler.generateRust();
     if(!fs.existsSync(fullBoilerplate)){
         fs.mkdirSync(fullBoilerplate,{recursive:true})
     }
+    
+    try {
+        await dbfillProblems(problem,readmeData,difficultyLevel as string,javaCode,cppCode,pythonCode,jsCode,fjavaCode,fcppCode,fpythonCode,fjsCode,test_case,test_case_ans);
+    } catch (error) {
+        console.log("Error in populating database ",error);
+    }
+    //-----------------------------------------------------------
+    fs.writeFileSync(path.join(boilerplatepath,"function.cpp"),cppCode);
+    fs.writeFileSync(path.join(boilerplatepath,"function.js"),jsCode);
+    fs.writeFileSync(path.join(boilerplatepath,"function.java"),javaCode);
+    fs.writeFileSync(path.join(boilerplatepath,"function.py"),pythonCode);
+    fs.writeFileSync(path.join(boilerplatepath,"function.rs"),rustCode);
+    //Break -----------------------------------------------------
     fs.writeFileSync(path.join(fullBoilerplate,"function.cpp"),fcppCode);
     fs.writeFileSync(path.join(fullBoilerplate,"function.java"),fjavaCode);
     fs.writeFileSync(path.join(fullBoilerplate,"function.py"),fpythonCode);
     fs.writeFileSync(path.join(fullBoilerplate,"function.js"),fjsCode);
-    fs.writeFileSync(path.join(fullBoilerplate,"function.rs"),frustCode);
+    // fs.writeFileSync(path.join(fullBoilerplate,"function.rs"),frustCode);
     }
 
 
+    const dbfillProblems = async(problem:string,readmeData:string,difficultyLevel:string,javaCode:string,cppCode:string,pythonCode:string,jsCode:string,fjavaCode:string,fcppCode:string,fpythonCode:string,fjsCode:string,test_case:any,test_case_ans:any)=>{
+        const ans = await prisma.problems.upsert({
+            where: {
+                slug: problem,
+                level: difficultyLevel          
+            },
+            update: {
+              description: readmeData,
+              boilerplateCppHalf: cppCode,
+              boilerplateJavaHalf: javaCode,
+              boilerplateJavascriptHalf: jsCode,
+              boilerplatePythonHalf: pythonCode,
+              boilerplateCppFull: fcppCode,
+              boilerplateJavaFull: fjavaCode,
+              boilerplateJavascriptFull: fjsCode,
+              boilerplatePythonFull: fpythonCode,
+              test_cases: test_case,
+              test_cases_ans: test_case_ans
+            },
+            create: {
+              slug: problem,
+              level: difficultyLevel,
+              description: readmeData,
+              boilerplateCppHalf: cppCode,
+              boilerplateJavaHalf: javaCode,
+              boilerplateJavascriptHalf: jsCode,
+              boilerplatePythonHalf: pythonCode,
+              boilerplateCppFull: fcppCode,
+              boilerplateJavaFull: fjavaCode,
+              boilerplateJavascriptFull: fjsCode,
+              boilerplatePythonFull: fpythonCode,
+              test_cases: test_case,
+              test_cases_ans: test_case_ans
+            },
+            select:{
+                test_cases_ans:true
+            }
+          });
+        // console.log("type of test",test_case);
+        console.log("type of ans =>",ans.test_cases_ans);
+        prisma.$disconnect()
+    }
+//   model Problems{
+    //     slug String @id -
+    //     description String[]  
+    //     boilerplateCppHalf String[] -
+    //     boilerplateJavaHalf String[] -
+    //     boilerplateJavascriptHalf String[] -
+    //     boilerplatePythonHalf String[] -
+    //     boilerplateCppFull String[] -
+    //     boilerplateJavaFull String[] -
+    //     boilerplateJavascriptFull String[] -
+    //     boilerplatePythonFull String[] -
+    //     test_cases String[] -
+    //     test_cases_ans String[] -
+    //     level String -
+    //     total_submissions Int 0
+    //     pass_percent Decimal 0
+    //     submissions     Submissions[]
+    //   }
+
+    // model User {
+    //     id       String   @id @default(uuid())
+    //     name     String   @unique
+    //     email    String   @unique
+    //     image    String  
+    //     submissions Submissions[] 
+    //   }
+      
+    
+      
+    //   model Submissions {
+    //     id             String       @id @default(uuid())
+    //     user           User         @relation(fields: [userId], references: [id])
+    //     userId         String
+    //     problem        Problems     @relation(fields: [problemSlug], references: [slug])
+    //     problemSlug    String
+    //     status         SubmissionStatus    
+    //     runtime        Int?         // Time taken to run the code in milliseconds
+    //     created_at     DateTime     @default(now())
+    //   }
+      
+    //   model Contest{
+    //     id String @id
+    //     name String
+    //     problemsId String[]
+    //     startTime DateTime
+    //   }
+      
+      
+    //   enum SubmissionStatus {
+    //     Accepted
+    //     WrongAnswer @map(name: "Wrong Answer")
+    //     CompileError @map(name: "Compile Error")
+    //     // Add more statuses as needed
+    //   }
 
 rl.question('Please enter the name of the problem file or type cts: ', (problemFileName) => {
     if(problemFileName.toLowerCase()==="cts"){
         rl.question("Enter id of contest : or type (show) :",(id)=>{
             var data = fs.readFileSync(path.join(__dirname, '../../web/util/Contests.json'),"utf-8");
             if(id.toLowerCase()==="show"){
+
+                //! do something over here
                 var data = fs.readFileSync(path.join(__dirname, '../../web/util/Contests.json'),"utf-8");
                 const dataContest:{contest:string,problems:{title:string,path:string,level:string,score:string,date:Date}[]}[] = JSON.parse(data);
                 dataContest.forEach((item,index)=>{
@@ -130,7 +256,8 @@ rl.question('Please enter the name of the problem file or type cts: ', (problemF
 
                 const keys:string[] = [];
                 const values:string[] = [];
-
+                
+                
                 problems.forEach(pair => {
                     const [key, value] = pair.split(':');
                     keys.push(key);
@@ -149,16 +276,25 @@ rl.question('Please enter the name of the problem file or type cts: ', (problemF
 
                 if(!allProblemsExist){
                     let dateQ:Date;
-                    rl.question("When should this contest happen (YYYY-MM-DD HH:MM)? ", (input) => {
+                    rl.question("When should this contest happen (YYYY-MM-DD HH:MM)? ", async(input) => {
                          dateQ = new Date(input);
                          if (isNaN(dateQ.getTime())) {
                             console.log("Invalid date format. Please enter the date in YYYY-MM-DD HH:MM format.");
                             
                             return; 
                         }
-                        dateQ.setHours(dateQ.getHours() + 5);
+                            
+                            dateQ.setHours(dateQ.getHours() + 5);
                             dateQ.setMinutes(dateQ.getMinutes() + 30);
-
+                            await prisma.contest.create({
+                                data:({
+                                    name:id,
+                                    startTime:dateQ,
+                                    score:values,
+                                    problemsId:keys
+            
+                                })
+                            })
 
                         const problemDs:{title:string,path:string,level:string,score:string,date:Date}[] = [];
                         keys.forEach((prob,index)=>{
@@ -180,40 +316,19 @@ rl.question('Please enter the name of the problem file or type cts: ', (problemF
                                     probds.date = dateQ;
     
                                     problemDs.push(probds);
-                                    // problemDs.push({
-                                    //     title: probExists.title,
-                                    //     path: probExists.path,
-                                    //     level: probExists.level,
-                                    //     score: values[index].toString(),
-                                    //     date: date
-                                    // });
+                                    
                                     console.log(probds)
-    
-                                    // a.push({contest:id,problems:problemDs})
-                                    // console.log();
-                                    // if(problemDs.length!==0){
-                                    //     fs.writeFileSync((path.join(__dirname, '../../web/util/Contests.json')), JSON.stringify(a, null, 2));  
-                                    //      console.log("Created contest problems");
-                                    // }
-                                    // console.log("Problem details with date:", problemDs);
-                                
-                                // });
+
                                
-                            }
-                            
-                                  
-                                
-                           
-                            
+                            }              
                         })
 
-
-
                         a.push({contest:id,problems:problemDs})
-                        if(problemDs.length!==0){
-                            fs.writeFileSync((path.join(__dirname, '../../web/util/Contests.json')), JSON.stringify(a, null, 2));  
-                             console.log("Created contest problems");
-                        }
+                        //! this one uncomeent for .json
+                        // if(problemDs.length!==0){
+                        //     fs.writeFileSync((path.join(__dirname, '../../web/util/Contests.json')), JSON.stringify(a, null, 2));  
+                        //      console.log("Created contest problems");
+                        // }
                         console.log("Problem details with date:", problemDs);
 
 
@@ -310,7 +425,8 @@ rl.question('Please enter the name of the problem file or type cts: ', (problemF
                             // a.push({ contest: id, problems: problemDs });
                             console.log(problemDs);
                             // probData
-                            fs.writeFileSync((path.join(__dirname, '../../web/util/Contests.json')), JSON.stringify(a, null, 2));
+                            //! this one uncomment for .json
+                            // fs.writeFileSync((path.join(__dirname, '../../web/util/Contests.json')), JSON.stringify(a, null, 2));
                             console.log("Created contest")
                         }
 
@@ -343,7 +459,7 @@ rl.question('Please enter the name of the problem file or type cts: ', (problemF
                 return console.log(round);
             }
         }
-    )
+        )
     }
 
 

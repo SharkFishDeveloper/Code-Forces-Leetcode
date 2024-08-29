@@ -1,88 +1,150 @@
+
 import React, { useEffect, useState } from 'react';
+import { useSession } from 'next-auth/react';
+import axios from 'axios';
+import FRONTEND_URL from '../app/functions/frontendurl';
 
 interface TestcaseInterface {
-  output: string;
-  testcase: string;
+  output: any;
+  testcase:any;
+  testcaseans: any;
   setProblemssolved?:(n:number)=>void,
   problemssolved:number,
   score:number,
-  setScore:(n:number)=>void
+  problemName:string;
+  setScore:(n:number)=>void;
+  type:string
 }
 
-const ShowTestCase = ({ output, testcase, setProblemssolved, problemssolved,score,setScore }: TestcaseInterface) => {
+function findScore(problemName:string,scoresArray:[]) {
+  for (const obj of scoresArray) {
+    //@ts-ignore
+      if (Object.prototype.hasOwnProperty.call(obj, problemName)) {
+          return obj[problemName];
+      }
+  }
+  return null;
+}
+
+
+
+//@ts-ignore
+function deepEqual(a, b) {
+  if (Array.isArray(a) && Array.isArray(b)) {
+      if (a.length !== b.length) return false;
+      return a.every((el, idx) => deepEqual(el, b[idx]));
+  }
+
+  if (typeof a === 'object' && a !== null && typeof b === 'object' && b !== null) {
+      const keysA = Object.keys(a);
+      const keysB = Object.keys(b);
+
+      if (keysA.length !== keysB.length) return false;
+      return keysA.every(key => deepEqual(a[key], b[key]));
+  }
+
+  return a === b;
+}
+
+
+
+const ShowTestCase = ({ output,testcase, testcaseans, problemName,setProblemssolved, problemssolved,setScore }: TestcaseInterface) => {
   const [passedTestCase, setPassedTestCase] = useState(0);
   const [totalTestCase, setTotalTestCase] = useState(0);
-  const [errortestcase,setErrortestcase] = useState<string|undefined>("");
-  const [outputtestcase,setOutputtestcase] = useState<string|undefined>("");
+  const session = useSession();
 
-    console.log("Output",output);
-    console.log("TEstCAse",testcase);
 
-  useEffect(() => {
-    function compareLines(input: any, test: any) {
-     try {
-        // const linesInput = String(input).split('\n');
-        // const linesTest = String(test).split('\n');
-
-        let linesInput = String(input).replace(/\r/g, '').split('\n');
-        let linesTest = String(test).replace(/\r/g, '').split('\n');
-
-        const filteredLinesInput = linesInput.filter(line => line.trim() !== '');
-        const filteredLinesTest = linesTest.filter(line => line.trim() !== '');
-
-        console.log("testcase length",testcase.length);
-        console.log("filteredLinesTest",filteredLinesTest.length);
-        // linesInput = String(input).split('\n');
-        //  linesTest = String(test).split('\n');
-
-        let passedCount = 0;
-        setTotalTestCase(filteredLinesTest.length);
-        for (let i = 0; i < filteredLinesTest.length; i++) {
-          const lineInput = filteredLinesInput[i]?.trim().replace(/\s+/g, '');
-          const lineTest = filteredLinesTest[i]?.trim().replace(/\s+/g, '');
-          
-          if (lineInput === lineTest) {
-              passedCount++;
-              setPassedTestCase(passedCount);
-            }else{
-                setErrortestcase(lineTest);
-                setOutputtestcase(lineInput);
-                return;
-            }
-        }
-        
+  if(!session){
+    return alert("Please login")
+  } 
   
-        
 
-     } catch (error) {
-        console.log(error);
-        return alert("Try another problem");
-     }
+  const testcasesOutputgiven = testcaseans.filter((line:any) => line.trim() !== '').map((line:any) => line.trim().replace(/\r/g, '')); 
+  console.log("----------------------------")
+  
+  // console.log("original OOUtpout",output,typeof output);
+  let yourOutput = output.split("\n").filter((line:any)=>line!=="");
+  // console.log("givenOutput",testcasesOutputgiven);
+  // console.log("youroutput",yourOutput);
+
+  if(yourOutput.length > testcasesOutputgiven.length){
+    const concatenatedString = yourOutput.join('');
+    let b = concatenatedString.replace(/\]\[/g, "]\n[");
+    yourOutput = b.split("\n");
+  }
+
+  function compareLines() {
+    let passedCount = 0;
+    setTotalTestCase(testcase.length);
+    for (let index = 0; index < testcasesOutputgiven.length; index++) {
+    const test = testcasesOutputgiven[index];
+    const yourOutputValue = yourOutput[index];
+    console.log("test",test,"yourOutput",yourOutputValue)
+      console.log(`${index}`,test.replace(/\s+/g, ''),yourOutput[index].replace(/\s+/g, ''))
+      try {
+
+        const check = deepEqual(yourOutputValue.replace(/\s+/g, ''),test.replace(/\s+/g, ''));
+        if(check){
+          passedCount += 1;
+        }else{
+          break;
+        }
+      } catch (error) {
+        console.log(error)
+      }
+     
+      setPassedTestCase(passedCount);
+    };
+    if(!setScore && passedCount === testcase.length){
+      setSubmission()
+      console.log("YOU PASSED ALL TEST CASES",passedCount,testcase.length)
     }
+  }
 
-    compareLines(output, testcase);
-  }, [output, testcase]);
+  const setSubmission = async()=>{
+    try {
+      //@ts-ignore
+      console.log("userId",session.data?.user.id)
+      await axios.put(`${FRONTEND_URL}/api/submissions`,{
+        //@ts-ignore
+        userId:session.data?.user.id,
+        status:"Accepted",
+        problemName
+      });
+    } catch (error) {
+      console.log("Cannot do it")
+    }
+  }
+
+  useEffect(() => {
+    compareLines();
+  }, [testcaseans]);
 
 
   useEffect(() => {
-    // if (passedTestCase === totalTestCase && setProblemssolved) {
-    //   setProblemssolved(problemssolved + 1); // Increment problemssolved by 1
-    // }
+
     if (setScore && setProblemssolved) {
-      const percentPassed = Math.floor((passedTestCase / totalTestCase) * 100);
+      const localStorageScore = localStorage.getItem("contest-scores");
+      const parsedScore = localStorageScore? JSON.parse(localStorageScore):null;
+      const fullScore = findScore(problemName,parsedScore);
+      if(!fullScore){
+          return alert("Please try again");
+      }
+      const percentPassed = Math.floor((passedTestCase / totalTestCase) * fullScore);
       if (percentPassed > 0) {
         //@ts-ignore
         setProblemssolved( problemssolved + 1); // Increment problemssolved by 1
         //@ts-ignore
-        setScore( percentPassed); // Increment score based on percent passed
+        setScore(percentPassed); // Increment score based on percent passed
       }
     }
   },  [passedTestCase, totalTestCase, setProblemssolved, setScore]);
 
-
   return (
     <div className="flex items-center justify-center min-h-[50%] bg-white p-4 text-white">
+      
   <div className="w-full max-w-4xl bg-black shadow-md rounded-md p-4 flex flex-col lg:flex-row">
+  <p>{problemssolved}</p>
     <div className="flex-grow lg:mr-8 mb-4 lg:mb-0">
       <div className="mb-4">
         <div className="font-bold">Time:</div>
@@ -96,15 +158,15 @@ const ShowTestCase = ({ output, testcase, setProblemssolved, problemssolved,scor
       </div>
       <div className="mb-4">
         <div className="font-bold">Problem:</div>
-        <div>problemName</div>
+        <div> {problemName.substring(0,1).toUpperCase()+problemName.substring(1,problemName.length)}</div>
       </div>
       <div className="mb-4">
         <div className="font-bold">Total Submissions:</div>
-        <div>totalSubmissions</div>
+        <div>-</div>
       </div>
       <div>
         <div className="font-bold">Pass Percentage:</div>
-        <div>passPercentage%</div>
+        <div>-</div>
       </div>
     </div>
 
@@ -112,20 +174,25 @@ const ShowTestCase = ({ output, testcase, setProblemssolved, problemssolved,scor
       {passedTestCase !== totalTestCase ? (
         <>
           <div className="mb-4">
+            <div className="font-bold">Testcase:</div>
+            <div className="bg-gray-800 p-4 rounded-md">{testcase[passedTestCase]}</div>
+          </div>
+          <div className="mb-4">
             <div className="font-bold">Correct Output:</div>
-            <div className="bg-gray-800 p-4 rounded-md">{errortestcase}</div>
+            <div className="bg-gray-800 p-4 rounded-md">{testcasesOutputgiven[passedTestCase]}</div>
           </div>
           <div className="mb-4">
             <div className="font-bold">Your Output:</div>
-            <div className="bg-gray-800 p-4 rounded-md">{outputtestcase}</div>
+                  <div className="bg-gray-800 p-4 rounded-md"> {yourOutput && yourOutput[passedTestCase] && yourOutput[passedTestCase].length < 450
+          ? yourOutput[passedTestCase]
+          : ""}</div>
           </div>
         </>
       ) : (
         <div className="text-center text-green-400">All test cases are passed</div>
       )}
-      
       <div className="flex items-center justify-center mt-4">
-        <div className="font-bold mr-2">{passedTestCase}/{totalTestCase} Test Cases Passed</div>
+        <div className="font-bold mr-2" >{passedTestCase}/{totalTestCase} Test Cases Passed</div>
         {passedTestCase === totalTestCase  ? (
           <span className="text-green-400">✔️</span>
         ) : (

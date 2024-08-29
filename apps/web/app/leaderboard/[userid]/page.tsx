@@ -16,6 +16,7 @@ const Leaderboard = ({ params }: { params: { userid:string } }) => {
   useEffect(() => {
     const fetchData = async () => {
       try {
+        console.log("params.userid",params.userid)
         const respo = await all_leader_board_user(params.userid);
         setData(respo);
         setLoading(false); // Update loading state when data is fetched
@@ -29,13 +30,14 @@ const Leaderboard = ({ params }: { params: { userid:string } }) => {
   }, []);
 
 
-  const handleLeaderBoardCLick =async (prob:string)=>{
+  const handleLeaderBoardCLick = async (prob:string)=>{
     setShow(p=>!p);
     setLoading2(true);
     try {
     const resp  = await leaderboard_user(prob,params.userid);
     console.log(resp);
-    // const cData = JSON.parse(resp.data.contestData);
+    console.log(prob,params.userid);
+  
     setMessage(resp.data.message);
     setcontestData(resp.data.contestData)
    } catch (error) {
@@ -47,15 +49,16 @@ const Leaderboard = ({ params }: { params: { userid:string } }) => {
   }
 
 
-  console.log(data); 
+  console.log("data",data); 
   return (
     !show ? (
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {loading && (<p></p>)}
         <div className="text-center mb-4">
           <h2 className="text-2xl font-bold">Contest Ranks</h2>
         </div>
   
-        {loading ? (
+        {loading2 ? (
           <div className="text-center">Loading...</div>
         ) : data && data.data ? (
           <div>

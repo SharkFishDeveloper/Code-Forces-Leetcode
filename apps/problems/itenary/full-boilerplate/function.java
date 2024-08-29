@@ -11,7 +11,7 @@ List<String> output1 = findItinerary(tickets1);
 
          System.out.print("[");
           for (int i = 0; i < output1.size(); i++) {
-              System.out.print("" + output1.get(i) + "");
+               System.out.print("\"" + output1.get(i) + "\"");
               if (i < output1.size() - 1) {
                   System.out.print(", ");
               }
@@ -28,7 +28,7 @@ List<String> output2 = findItinerary(tickets2);
 
          System.out.print("[");
           for (int i = 0; i < output2.size(); i++) {
-              System.out.print("" + output2.get(i) + "");
+               System.out.print("\"" + output2.get(i) + "\"");
               if (i < output2.size() - 1) {
                   System.out.print(", ");
               }

@@ -2,7 +2,7 @@
 
 import  { useRef } from "react";
 
-import Editor from "@monaco-editor/react";
+import Editor from "@monaco-editor/react"
 
 interface CodeEditorProps {
   lang: string;
@@ -16,7 +16,7 @@ interface CodeEditorProps {
 
 const CodeEditor:React.FC<CodeEditorProps> = ({lang,mode,width,code,setCode})=> {
   const editorRef = useRef(null);
-
+//@ts-ignore
   function handleEditorDidMount(editor, monaco) {
     // here is the editor instance
     // you can store it in `useRef` for further usage

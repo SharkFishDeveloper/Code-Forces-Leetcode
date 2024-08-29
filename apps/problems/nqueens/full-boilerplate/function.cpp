@@ -1,6 +1,4 @@
 
-        #include <iostream>
-        using namespace std;
 
         ###USER_CODE_HERE
 

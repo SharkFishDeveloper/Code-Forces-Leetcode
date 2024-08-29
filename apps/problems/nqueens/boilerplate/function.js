@@ -1,4 +1,6 @@
-function nqueens (num) {
+
+//Add imports here
+    function nqueens (num) {
     // Your code
     return result;
 }

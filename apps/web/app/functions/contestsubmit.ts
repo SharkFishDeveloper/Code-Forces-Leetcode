@@ -1,12 +1,13 @@
 "use server"
 
 import axios from "axios";
+import BACKEND_URL from "./backendurl";
 
 async function contestProblem(data:any) {
    try {
     const userData:{contest:string,solvedProblems:number,allproblems:number,score:number,user:any,time:number,username:string | null | undefined} = data;
     console.log(userData);
-    const resp = await axios.post(`http://localhost:4000/contest/${userData.contest}`,userData);
+    const resp = await axios.post(`${BACKEND_URL}/contest/${userData.contest}`,userData);
     console.log(resp.data);
     return {message:"Submitted"};
    } catch (error) {
@@ -14,12 +15,3 @@ async function contestProblem(data:any) {
    }
 }
 export default contestProblem;
-
-
-// contest: string;
-//     solvedProblems: number;
-//     allproblems: number | undefined;
-//     score: number;
-//     user: any;
-//     time: number;
-//     username: string | null | undefined;

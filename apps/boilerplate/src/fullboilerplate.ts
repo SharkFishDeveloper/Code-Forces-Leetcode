@@ -7,6 +7,7 @@ export class FullBoilerplate{
     javaCode:string="";
     problem:string="";
     testcases:any[] = [];
+    testcases_ans:any[] = [];
     inputFields:{type:string,name:string}[] = [];
     outputFields:{type:string,name:string}[] = [];
     functionName:string="";
@@ -25,8 +26,7 @@ export class FullBoilerplate{
     parseTestCase(){
         const bplatePath = path.join(__dirname,PROBLEM_PATH,this.problem,"test_case");
         console.log(this.problem);
-        // console.log( path.join(__dirname,PROBLEM_PATH,this.problem,"test_case"))
-        // return;
+
         if(!fs.existsSync(path.join(bplatePath,"test.txt"))){
             console.log("Make test cases first !! Here I created files enjoy :)");
             console.log("Test cases should be in one line and after one line")
@@ -34,25 +34,37 @@ export class FullBoilerplate{
             fs.writeFileSync(path.join(bplatePath,"test.txt"),'');
             fs.writeFileSync(path.join(bplatePath,"sol.txt"),'');
             return ;
-        }
+          }
         const testPath = path.join(__dirname,PROBLEM_PATH,this.problem,"test_case","test.txt");
+        const ansPath = path.join(__dirname,PROBLEM_PATH,this.problem,"test_case","sol.txt");
 
-            const file_content = fs.readFileSync(testPath,"utf-8");
+        const file_content = fs.readFileSync(testPath,"utf-8");
         console.log("problem",path.join(__dirname,PROBLEM_PATH,this.problem,"test_case","test.txt"),"file_content");
-        // return ;
-        const lines = file_content.trim().split('\n');
 
-        lines.forEach((line)=>{
-            const trimmedLine = line.trim();
-            const values = trimmedLine.split(/\s+/)
-            if(trimmedLine!==''){
-                const transformedValues = values.map((item)=>{
-                    console.log(item);
-                })
-                this.testcases.push(values);
-            }
+        
+        const file_content_testans = fs.readFileSync(ansPath,"utf-8");
+        console.log("problem",path.join(__dirname,PROBLEM_PATH,this.problem,"test_case","sol.txt"),"file_content_ans");
+        
+        const lines_test = file_content.trim().split('\n');
+        const lines_ans = file_content_testans.trim().split('\n');
+
+        lines_test.forEach((line,i)=>{
+          const trimmedLine = line.trim();
+          if(trimmedLine!==''){
+            console.log("INDEX",i,trimmedLine);
+            this.testcases.push(trimmedLine);
+          }
         })
-        console.log("test cases ############",this.testcases);
+
+
+        lines_ans.forEach((line,i)=>{
+          const trimmedLine = line.trim();
+          if(trimmedLine!==''){
+            // console.log("INDEX ",i,line)
+            this.testcases_ans.push(line);
+          }
+      })
+
         console.log(this.inputFields);
         console.log(this.outputFields)
         this.generateCpp();
@@ -64,20 +76,17 @@ export class FullBoilerplate{
     generateCpp():string{
         const stateCpp = () => {
             return this.testcases
-            .map((item, index) => {
+            .map((item, index) => { 
+                const splitItem = item.split(" ");
                 let ds = [];
                 let code = "";
                 for (let i = 0; i < this.inputFields.length; i++) {
                   const a = resultCpp(this.inputFields[i].type); //name
                   const b = this.inputFields[i].name;
-                  const value = parseInputCpp(a, item[i]); //value
+                  const value = parseInputCpp(a, splitItem[i]); //value
                   ds.unshift(`${b}${index + 1}`);
-                  // console.log(`${a} ${b}${index + 1} = ${value};`);
                   code += `  ${a} ${b}${index + 1} = ${value};\n`;
                 }
-                // console.log(
-                //   `${result(outputfields[0].type)} output${index + 1} = ${functionName}(${ds.reverse()});`,
-                // );
                 code += `${resultCpp(this.outputFields[0].type)} output${index + 1} = ${this.functionName}(${ds.reverse()});\n`;
                 const outputPrint = outputPrintLogCpp(
                     this.outputFields[0].type,
@@ -101,33 +110,26 @@ export class FullBoilerplate{
         return cppCode;
     }
 
-    // ${this.testcases.map((test, index) => `
-            
-    //     ${this.outputFields[0].type} a${index + 1} = ${this.problem}(${test.map(
-        
-    //         (            t: any[]) =>`${t}`)});
-    // cout<< a${index + 1}<<endl;`).join('\n        ')}
 
     generateJava(): string {
 
         const state = ()=>{
            return this.testcases.map((item, index) => {
+                console.log("INDEX MAP",index,item);
+                const splitItem = item.split(" ");
                 let ds = [];
-                 let code:string="";
+                let code:string="";
                 for (let i = 0; i < this.inputFields.length; i++) {
                   const a = resultJava(this.inputFields[i].type); //name
-                   const b = this.inputFields[i].name;
-                  const value = parseInputJava(a, item[i]); //value
+                  const b = this.inputFields[i].name;
+                  console.log("value",splitItem[i]);
+                  const value = parseInputJava(a, splitItem[i]); //value
                   ds.unshift(`${b}${index + 1}`);
-                //   console.log(`${a} ${b}${index + 1} = ${value};`);
                   code+=`${a} ${b}${index + 1} = ${value};\n`;
                 }
-                // console.log(`${resultJava(this.outputFields[0].type)} output${index+1} = ${this.functionName}(${ds.reverse()});`);
                 code+=(`${resultJava(this.outputFields[0].type)} output${index+1} = ${this.functionName}(${ds.reverse()});\n`);
                 const outputPrint = outputPrintLog(this.outputFields[0].type,`output${index+1}`);
-                // console.log(outputPrint);
                 code+=`${outputPrint}\n`;
-                // return outputPrint;
                 return code;
               });
         }
@@ -143,55 +145,62 @@ export class FullBoilerplate{
   
         return javaCode;
     }
-    
-    // ${this.testcases.map((test, index) =>
-    //     `
-        
-    //     ${this.outputFields[0].type} result${index + 1} = ${this.problem}(${test.map((t: any) => `${t}`).join(', ')});
-    //     System.out.println(result${index + 1});`).join('\n')}
+
 
     generatePython(): string {
-        const pythonCode = `
-        ###USER_CODE_HERE
+      const pythonCode = `
+          ###USER_CODE_HERE
 def main():
-        ${this.testcases.map((test, index) => `
-            result_${index + 1} = ${this.problem}(${test.map((t: any) => `${t}`).join(', ')})
-            print(result_${index + 1})`).join('\n    ')}
-    
+    ${this.testcases.map((test, index) => {
+          // Assuming `test` is a string that needs to be split by space
+        const splitTest = test.split(" "); // Split test string into individual elements
+  
+    return `
+    result_${index + 1} = ${this.problem}(${splitTest.map((t: any) => `${t}`).join(', ')})
+    print(result_${index + 1})`;
+}).join('\n    ')}
+  
 if __name__ == "__main__":
-        main()
+    main()
+      `;
+      return pythonCode.trim();
+  }
+    
+  
+  generateJs(): string {
+    const jsCode = `
+        ###USER_CODE_HERE
+function main() {
+    ${this.testcases.map((test, index) => {
+        // Assuming `test` is a string that needs to be split by spaces
+        const splitTest = test.split(" "); // Split test string into individual elements
+
+        return `
+        const result${index + 1} = ${this.functionName}(${splitTest.map((t: any) => `${t}`).join(', ')});
+        console.log(result${index + 1});`;
+    }).join('\n    ')}
+}
+
+main();
     `;
-        return pythonCode.trim(); // Trim to remove any leading/trailing whitespace
-    }
-    
-    generateJs(): string {
-        const jsCode = `
-           ###USER_CODE_HERE
-    function main() {
-        ${this.testcases.map((test, index) => `
-        const result${index + 1} = ${this.functionName}(${test.map((t: any) => `${t}`).join(', ')});
-        console.log(result${index + 1});`).join('\n    ')}
-    }
-    
-    main();
-        `;
-        return jsCode.trim(); // Trim to remove any leading/trailing whitespace
-    }
+    return jsCode.trim();
+}
+
     
 
-    generateRust(): string {
-        const rustCode = `
-            fn main() {
-                // Add user code here
-                ###USER_CODE_HERE
+    // generateRust(): string {
+    //     const rustCode = `
+    //         fn main() {
+    //             // Add user code here
+    //             ###USER_CODE_HERE
                 
-                ${this.testcases.map((test, index) => `
-                let result${index + 1} = ${this.problem}(${test.map((t: any) => `${t}`).join(', ')});
-                println!("{}", result${index + 1});`).join('\n            ')}
-            }
-        `;
-        return rustCode.trim(); // Trim to remove any leading/trailing whitespace
-    }
+    //             ${this.testcases.map((test, index) => `
+    //             let result${index + 1} = ${this.problem}(${test.map((t: any) => `${t}`).join(', ')});
+    //             println!("{}", result${index + 1});`).join('\n            ')}
+    //         }
+    //     `;
+    //     return rustCode.trim(); // Trim to remove any leading/trailing whitespace
+    // }
     
 
 
@@ -332,11 +341,12 @@ const resultJava = ((ds:any) => {
           }
           System.out.println("]");`
         return aq;
+
       case "List<String>":
         const az = `
          System.out.print("[");
           for (int i = 0; i < ${name}.size(); i++) {
-              System.out.print("\" + ${name}.get(i) + "\");
+               System.out.print("\\"" + ${name}.get(i) + "\\"");
               if (i < ${name}.size() - 1) {
                   System.out.print(", ");
               }
@@ -349,7 +359,7 @@ const resultJava = ((ds:any) => {
           for (int i = 0; i < ${name}.size(); i++) {
               System.out.print("[");
               for (int j = 0; j < ${name}.get(i).size(); j++) {
-                  System.out.print("\" + ${name}.get(i).get(j) + "\");
+                  System.out.print("\\"" + ${name}.get(i).get(j) + "\\"");
                   if (j < ${name}.get(i).size() - 1) {
                       System.out.print(",");
                   }
@@ -449,13 +459,13 @@ const resultJava = ((ds:any) => {
       case "bool":
       case "double":
       case "string":
-        return `cout << ${name} << ";" << endl;`;
+        return `cout << ${name}  << endl;`;
       case "vector<char>":
         return `cout << "[";
           for (int i = 0; i < ${name}.size(); i++) {
               cout << "'" << ${name}[i] << "'";
               if (i < ${name}.size() - 1) {
-                  cout << ",";
+                  cout << ","; 
               }
           }
           cout << "]" << endl;`;
@@ -467,7 +477,7 @@ const resultJava = ((ds:any) => {
                   cout << ",";
               }
           }
-          cout << "]" << endl;`;
+          cout << "]" << endl`;
       case "vector<vector<char>>":
         return `cout << "[";
           for (int i = 0; i < ${name}.size(); i++) {
