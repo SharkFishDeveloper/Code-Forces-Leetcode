@@ -25,7 +25,6 @@ const Problems = () => {
   useEffect(() => {
     setLoading(true);
     const fetchProblms = async()=>{
-        console.log("`${FRONTEND_URL}/api/fetch-problems`",`${FRONTEND_URL}/api/fetch-problems`)
       const resp = await axios.get(`${FRONTEND_URL}/api/fetch-problems`);
       if(resp.data.status==="200"){
           setProblems({message:resp.data.message,status:resp.data.status});

@@ -2,8 +2,7 @@
 import { useSession } from 'next-auth/react'
 import Link from 'next/link'
 import React from 'react'
-import { Button } from '@repo/ui/button'
-import { Prisma } from '@repo/db/prisma'
+
 
 const LandingPage = () => {
   const { data: session } = useSession();

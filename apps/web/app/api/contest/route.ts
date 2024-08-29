@@ -17,9 +17,12 @@ export async function GET() {
             take:4
         });
 
-        await setAsync(cacheKey,JSON.stringify(resp),"EX",10000)
+        try {
+            await setAsync(cacheKey,JSON.stringify(resp),"EX",10000)
+        } catch (error) {
+            console.log("REDIS ERROR",error)
+        }
         return NextResponse.json({resp},{status:200})
-        // }
     } catch (error) {
         return NextResponse.json({message:error},{status:504});
     }finally{
