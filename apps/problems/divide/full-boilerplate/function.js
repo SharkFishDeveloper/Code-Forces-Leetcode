@@ -1,6 +1,6 @@
 ###USER_CODE_HERE
-    function main() {
-        
+function main() {
+    
         const result1 = divide(2, 2);
         console.log(result1);
     
@@ -15,6 +15,6 @@
     
         const result5 = divide(100, 1);
         console.log(result5);
-    }
-    
-    main();
+}
+
+main();

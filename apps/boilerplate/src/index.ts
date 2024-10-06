@@ -61,15 +61,9 @@ async function processInputFiles(problem: string,difficulty:string,inputpath:str
     let readmeData = "";
     if(!fs.existsSync(problemReadme)){
         fs.writeFileSync(problemReadme,"");
-        // fs.mkdirSync(boilerplatepath,{recursive:true})
         return console.log("Fill Problem.md file")
     }
     readmeData = fs.readFileSync(problemReadme,"utf-8");
-    // fs.writeFileSync(path.join(boilerplatepath,"function.cpp"),cppCode);
-    // fs.writeFileSync(path.join(boilerplatepath,"function.js"),jsCode);
-    // fs.writeFileSync(path.join(boilerplatepath,"function.java"),javaCode);
-    // fs.writeFileSync(path.join(boilerplatepath,"function.py"),pythonCode);
-    // fs.writeFileSync(path.join(boilerplatepath,"function.rs"),rustCode);
     console.log("Boilerplate code generated successfully!");
     const inputFields = partialParser.inputFields;
     const outputFields = partialParser.outputFields;
@@ -121,7 +115,6 @@ async function processInputFiles(problem: string,difficulty:string,inputpath:str
     fs.writeFileSync(path.join(fullBoilerplate,"function.java"),fjavaCode);
     fs.writeFileSync(path.join(fullBoilerplate,"function.py"),fpythonCode);
     fs.writeFileSync(path.join(fullBoilerplate,"function.js"),fjsCode);
-    // fs.writeFileSync(path.join(fullBoilerplate,"function.rs"),frustCode);
     }
 
 
