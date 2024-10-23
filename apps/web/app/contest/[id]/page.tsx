@@ -290,7 +290,7 @@ async function onFinishTimer (){
     await contestProblem(contestUserObj)
     toast.success(`Thank you for participating`)
 
-    // router.replace("/");
+    router.replace("/");
   } catch (error) {
     alert("Some issue with submitting")
   };
