@@ -5,7 +5,6 @@ import BACKEND_URL from "./backendurl";
 import { address } from "ip";
 
 async function leaderboard_user(contest:string,userid:string){
-    console.log("))))))))))", contest,userid)
     try {
         const ipAddress = `http://${address()}:4000`;
       const resp = await axios.post(`${ipAddress}/leaderboard/contest/${contest}/data`,{userId:userid});
