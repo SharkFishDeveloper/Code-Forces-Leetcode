@@ -5,9 +5,9 @@ import { address } from "ip";
 
 async function contestProblem(data:any) {
    try {
-   const ipAddress = `http://${address()}:4000`;
-    const userData:{contest:string,solvedProblems:number,allproblems:number,score:number,user:any,time:number,username:string | null | undefined} = data;
-    const resp = await axios.post(`${ipAddress}/contest/${userData.contest}`,userData);
+      const userData:{contest:string,solvedProblems:number,allproblems:number,score:number,user:any,time:number,username:string | null | undefined} = data;
+      const ipAddress = `http://${address()}:4000`;
+      const resp = await axios.post(`${ipAddress}/contest/${userData.contest}`,userData);
    
     console.log(resp.data);
     console.log(userData);

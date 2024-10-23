@@ -19,7 +19,6 @@ async function Submit({code,selectedLanguage}) {
         }
         //@ts-ignore
         userId =  session?.user.id; 
-        console.log("****",ip.address('public'))
         const ipAddress = `http://${address()}:4000`;
         
         const resp = await axios.post(`${ipAddress}/submit-code`,{code,selectedLanguage:language,userId});

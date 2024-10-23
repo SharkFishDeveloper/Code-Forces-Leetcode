@@ -14,16 +14,19 @@ const Contest = () => {
     const fetchContest = async()=>{
       setLoading(true);
       const resp = await axios.get(`${FRONTEND_URL}/api/contest`);
+      console.log("ALL CONTESTS",resp.data.resp)
+      // return;
       if(resp.status===200){
         setContest(resp.data.resp);
         //@ts-ignore
         const modContest = resp.data.resp.sort((a,b)=>{
+          if(resp.data.resp===undefined)return;
           //@ts-ignore
-          if(a.problems[0]?.date &&b.problems[0]?.date ){
+          if(a.date &&b.date ){
         //@ts-ignore
-            const dateA = new Date(a.problems[0].date).getTime();
+            const dateA = new Date(a.date).getTime();
             //@ts-ignore
-            const dateB = new Date(b.problems[0].date).getTime();
+            const dateB = new Date(b.date).getTime();
             return dateA - dateB;
           }
         });
