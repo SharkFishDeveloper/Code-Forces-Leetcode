@@ -10,26 +10,26 @@ export async function POST(req:NextRequest){
     const {slug} =  await req.json();
     try {
 
-        // const cacheKey = `problem:${slug}`;
-        // let cachedData = await getAsync(cacheKey);
-        //     if (cachedData) {
-        //     cachedData = JSON.parse(cachedData);
-        //     //@ts-ignore
-        //     const description = cachedData.description;
-        //     //@ts-ignore
-        //     const test_cases = cachedData.test_cases;
-        //     //@ts-ignore
-        //     const test_cases_ans = cachedData.test_cases_ans;
-        //     //@ts-ignore
-        //     console.log("Cache hit in PROBLEMS",new Date());
-        //     return  NextResponse.json({message:{
-        //         description,
-        //         test_cases,
-        //         test_cases_ans
-        //     }},{status:200})
-        //   }else{
-        //     console.log("NOT HIT PROBLEMS")
-        //   }
+        const cacheKey = `problem:${slug}`;
+        let cachedData = await getAsync(cacheKey);
+            if (cachedData) {
+            cachedData = JSON.parse(cachedData);
+            //@ts-ignore
+            const description = cachedData.description;
+            //@ts-ignore
+            const test_cases = cachedData.test_cases;
+            //@ts-ignore
+            const test_cases_ans = cachedData.test_cases_ans;
+            //@ts-ignore
+            console.log("Cache hit in PROBLEMS",new Date());
+            return  NextResponse.json({message:{
+                description,
+                test_cases,
+                test_cases_ans
+            }},{status:200})
+          }else{
+            console.log("NOT HIT PROBLEMS")
+          }
 
 
         await prisma.$connect()
@@ -42,9 +42,9 @@ export async function POST(req:NextRequest){
         test_cases_ans:true,
         }});
 
-        // const problemsForCache = problems;
+        const problemsForCache = problems;
 
-        // await setAsync(cacheKey, JSON.stringify(problemsForCache));
+        await setAsync(cacheKey, JSON.stringify(problemsForCache));
 
 
 

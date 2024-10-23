@@ -75,12 +75,14 @@ const AppBar = () => {
             {openProfile && (
               <div className="absolute right-0 mt-2 w-[15rem] bg-white text-black rounded-lg shadow-lg z-10">
                 <div className="flex items-center space-x-2 p-2">
-                  <Image src={session.user?.image!} alt="User Icon" width={30} height={30} className="rounded-full" />
+
+                  {/* <Image src={session.user?.image!} alt="User Icon" width={30} height={30} className="rounded-full" /> */}
+                    {/* TODO: Add user images */}
                   <div>
                     {session.user && (
                       <>
-                        <p className="font-semibold">{session.user.name}</p>
-                        <p className="text-xs text-gray-500">{session.user.email}</p>
+                        <p className="font-semibold ml-4">{session.user.name}</p>
+                        <p className="text-xs text-gray-500 ml-4">{session.user.email}</p>
                       </>
                     )}
                   </div>

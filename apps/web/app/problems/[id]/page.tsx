@@ -27,6 +27,31 @@ const Problem = ({ params }: { params: { id: string, title: string, path: string
     const [submission,showSubmission] = useState(false);
     const [submitButton,showSubmitButton] = useState(true);
 
+    const findMd = async()=>{
+        try {
+         const resp = await axios.post(`${FRONTEND_URL}/api/problems`,{slug:params.id});
+         console.log(resp);
+         if(resp.status===200){
+         console.log(resp.data.message.description);
+         setShowmd(resp.data.message.description);
+         setCode(resp.data.message.boilerplatehalfcode);
+         setFullCode(resp.data.message.boilerplatefullcode);
+         setTestcase(resp.data.message.test_cases);
+         setTest_case_ans(resp.data.message.test_cases_ans);
+         // console.log("TESTCASES_ANSWERS=>",resp.data.message.test_cases_ans);
+         }
+         else if(resp.status===400){
+             return alert("Something bad happened");
+         }
+        } catch (error) {
+         console.log(error);
+         return alert("Something bad happened");
+        }finally{
+         setLoading(false);
+        }
+     }
+
+
     useEffect(() => {
         if (showtestcase && scrollRef.current) {
             scrollRef.current.scrollIntoView({ behavior: 'smooth' });
@@ -34,33 +59,12 @@ const Problem = ({ params }: { params: { id: string, title: string, path: string
     }, [showtestcase]);
 
 
-
+    // findMd();
     useEffect(()=>{
-        setLoading(true);
-        const findMd = async()=>{
-           try {
-            const resp = await axios.post(`${FRONTEND_URL}/api/problems`,{slug:params.id});
-            console.log(resp);
-            if(resp.status===200){
-            console.log(resp.data.message.description);
-            setShowmd(resp.data.message.description);
-            setCode(resp.data.message.boilerplatehalfcode);
-            setFullCode(resp.data.message.boilerplatefullcode);
-            setTestcase(resp.data.message.test_cases);
-            setTest_case_ans(resp.data.message.test_cases_ans);
-            // console.log("TESTCASES_ANSWERS=>",resp.data.message.test_cases_ans);
-            }
-            else if(resp.status===400){
-                return alert("Something bad happened");
-            }
-           } catch (error) {
-            console.log(error);
-            return alert("Something bad happened");
-           }finally{
-            setLoading(false);
-           }
+        if(selectedLanguage==="C++"){
+            setLoading(true);
+            findMd();
         }
-        findMd();
         
     },[selectedLanguage]);
 
@@ -71,7 +75,7 @@ const Problem = ({ params }: { params: { id: string, title: string, path: string
             try {
                 const language = selectedLanguage === "C++" ? "cpp" :
                     selectedLanguage === "Java" ? "java" :
-                    selectedLanguage === "Python" ? "py" :
+                    selectedLanguage === "Python" ? "python" :
                     selectedLanguage === "Javascript" ? "js" :
                     selectedLanguage === "Rust" ? "rs" :
                     "";
@@ -79,11 +83,17 @@ const Problem = ({ params }: { params: { id: string, title: string, path: string
                         return ;
                     }
                     try {
+                    console.log("SELECTED LANGAUGE-> CHANGING",selectedLanguage)
                     const resp = await axios.post(`${FRONTEND_URL}/api/problems-boilerplate`,{slug:params.id,language:language});
+
                     setCode(resp.data.message.boilerplateHalf || resp.data.message.responseObject.boilerplateHalf);
+
                     console.log("Boilerplate",resp.data.message.boilerplateHalf || resp.data.message.responseObject.boilerplateHalf)
+
                     setFullCode(resp.data.message.boilerplateFull || resp.data.message.responseObject.boilerplateFull);
+                    
                     } catch (error) {
+                        console.log(error)
                     return alert("Error in fetching boilerlplate");
                     }
                     } catch (error) {
@@ -107,6 +117,7 @@ const Problem = ({ params }: { params: { id: string, title: string, path: string
     }
 
     const handleSubmit = async () => {
+        console.log("SUBMIT IN LANGUAGE=>",selectedLanguage);
         setShowtestcase(false);
         let final_user_code="";
         if(selectedLanguage==="Java"){
@@ -124,18 +135,20 @@ const Problem = ({ params }: { params: { id: string, title: string, path: string
         setLoading(true);
         try {
             const Language = selectedLanguage.toLowerCase();
+            console.log("language->",selectedLanguage);
             const resp = await Submit({ selectedLanguage: Language, code: final_user_code });
-            if(resp?.status===300 || resp?.status===429){
+            if(resp?.status===300){
                 return alert(resp.message)
             }
-            if (resp?.result.run.signal === "SIGKILL" && retryCount < maxRetries) {
-                retryCount++;
-                await runAgainFx();
-            } else if (retryCount >= maxRetries) {
-                alert("Try again after some time :( or try in different language");
-                retryCount = 0;
-                return;
-            } else if (resp?.result.run.output!==undefined) {
+            // if (resp?.result.run.signal === "SIGKILL" && retryCount < maxRetries) {
+            //     retryCount++;
+            //     await runAgainFx();
+            // } else if (retryCount >= maxRetries) {
+            //     alert("Try again after some time :( or try in different language");
+            //     retryCount = 0;
+            //     return;
+            // } else 
+            if (resp?.result.run.output!==undefined) {
               setOutput(resp?.result.run.output);
             }
              await checkTestCases();
