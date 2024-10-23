@@ -1,7 +1,7 @@
 import axios from "axios";
 import { getSession } from "next-auth/react";
 import BACKEND_URL from "./backendurl";
-
+import  ip,{ address } from "ip";
 export interface submitReq {
     selectedLanguage:string,
     code:string,
@@ -17,20 +17,24 @@ async function Submit({code,selectedLanguage}) {
         if (!session) {
             return {message:"Please login first",status:300,result:"error"}; 
         }
-    //@ts-ignore
-    userId =  session?.user.id;
-
-        const resp = await axios.post(`${BACKEND_URL}/submit-code`,{code,selectedLanguage:language,userId});
-        console.log(resp.data)
-        if(resp.data.stderr!==undefined){
+        //@ts-ignore
+        userId =  session?.user.id; 
+        console.log("****",ip.address('public'))
+        const ipAddress = `http://${address()}:4000`;
+        
+        const resp = await axios.post(`${ipAddress}/submit-code`,{code,selectedLanguage:language,userId});
+        console.log("resp",resp.data)
+        if(resp.data.stderr!==""){
             return {
                 message: "Please fix your code",
-                result: resp.data.stderr
+                result: resp.data.stderr,
+                status:403
             };
         }
         return {
             message: "Code executed successfully",
-            result: resp.data.result
+            result: resp.data.result,
+            status:200
         };
 
     } catch (error) {

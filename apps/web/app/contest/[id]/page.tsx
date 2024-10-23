@@ -18,8 +18,11 @@ import toast from 'react-hot-toast'
 const ContestRound = ({params}:{params:{id:string}}) => {
   const router = useRouter();
   const [problemssolved,setProblemssolved] = useState(0);
+
   const [score,setScore] = useState(0);
+
   const { data: session } = useSession<Session|any>();
+  const [errorTestCase,setErrorTestCase] = useState("");
   
 
   let userId:string="";
@@ -33,9 +36,7 @@ const ContestRound = ({params}:{params:{id:string}}) => {
     const [code, setCode] = useState<string>(localStorage?.getItem('userCode') || "");
     const [selectedLanguage, setSelectedLanguage] = useState<string>("C++");
     const [loading,setLoading] = useState(false);
-    // const [runagain,setRunagain] = useState(false);
-    let retryCount = 1;
-    const maxRetries = 2;
+
 
     const [fullcode, setFullCode] = useState("");
     const [testcase, setTestcase] = useState("");
@@ -46,7 +47,14 @@ const ContestRound = ({params}:{params:{id:string}}) => {
     const [cproblems,setcproblems] = useState<string[]|null>();
 
     const [problemTitle,setproblemTitle] = useState<string>();
-    const [problemScore,setproblemscore] = useState<{ problem: string; score: number }[]>([]);
+    
+    const [problemScore,setproblemscore] = useState<{ problem: string; score: number }[]>(() => {
+      // Retrieve and parse the value from localStorage
+      const storedScores = localStorage.getItem('problemScores');
+      return storedScores ? JSON.parse(storedScores) : []; // Return parsed value or an empty array
+  });
+
+
     const [showMd,setShowmd] = useState<string|null>("");
 
 
@@ -191,10 +199,11 @@ const ContestRound = ({params}:{params:{id:string}}) => {
 
 
     const fetchBoilerPlate = async ({title}:{title:string,language:string}) => {
+      setShowtestcase(false);
       try {
           const language = selectedLanguage === "C++" ? "cpp" :
               selectedLanguage === "Java" ? "java" :
-              selectedLanguage === "Python" ? "py" :
+              selectedLanguage === "Python" ? "python" :
               selectedLanguage === "Javascript" ? "js" :
               selectedLanguage === "Rust" ? "rs" :
               "";
@@ -211,14 +220,6 @@ const ContestRound = ({params}:{params:{id:string}}) => {
       }
   }
 
-    const runAgainFx = async () => {
-        try {
-            await handleSubmit();
-        } catch (error) {
-            console.log(error);
-        }
-    }
-
 
     
 
@@ -227,6 +228,7 @@ async function checkTestCases() {
   }
 
     const handleSubmit = async () => {
+        setErrorTestCase("");
         setShowtestcase(false);
         let final_user_code="";
         if(selectedLanguage==="Java"){
@@ -246,25 +248,24 @@ async function checkTestCases() {
             const resp = await Submit({  selectedLanguage: Language, code: final_user_code });
 
             if(resp?.status===300){
-                return alert(resp.message)
-            }
-            if (resp?.result.run.signal === "SIGKILL" && retryCount < maxRetries) {
-                retryCount++;
-                await runAgainFx();
-            } else if (retryCount >= maxRetries) {
-                alert("Try again after some time :( or try in different language");
-                retryCount = 0;
-                return;
-            } else if (resp?.result.run.output!==undefined) {
-              setOutput(resp?.result.run.output);
-            }
-             await checkTestCases();
+              return alert(resp.message)
+          }
+          if (resp?.status===403) {
+            setErrorTestCase(resp?.result);
+          }
+          else if (resp?.status===200) {
+            setOutput(resp?.result);
+          }
+           await checkTestCases();
         } catch (error) {
             return alert(error);
         } finally {
             setLoading(false);
+            console.log("problemScore",problemScore)
+          
         }
     }
+
 
 
 async function onFinishTimer (){
@@ -289,7 +290,7 @@ async function onFinishTimer (){
     await contestProblem(contestUserObj)
     toast.success(`Thank you for participating`)
 
-    router.replace("/");
+    // router.replace("/");
   } catch (error) {
     alert("Some issue with submitting")
   };
@@ -299,16 +300,18 @@ async function onFinishTimer (){
 }
 
 
-  console.log("problemTitle",problemTitle)
-  console.log(problemssolved);
-
   return (
     <div className="">
          <div className=" text-center">
       Score - {score }
+      problemName - {problemTitle}
+      time - {timeleft}
+      <div>
+        MAP - {JSON.stringify(problemScore)}
+      </div>
     <p>{localStorage.getItem('contest-score')}</p>
         <div className="text-lg font-bold flex justify-between p-3">
-        <p className="font-bold text-2xl">Welcome to round - {params.id}</p>
+        <p className="font-bold text-2xl">Round - {params.id}</p>
 
         <div className="flex flex-col justify-center items-center text-sm h-[3rem] bg-gray-50 hover:bg-gray-200 w-[5rem] rounded-md">
         <span className=" cursor-pointer  " onClick={()=>onFinishTimer()}>Finish</span>
@@ -352,13 +355,39 @@ async function onFinishTimer (){
       </div>
     </div>
     {showtestcase && (
-             //@ts-ignore
+            //  @ts-ignore
             <ShowTestCase output={output} testcaseans={testcaseans} testcase={testcase} problemName={problemTitle} type="CONTEST" 
             setProblemssolved={setProblemssolved} problemssolved={problemssolved}
-            score={score} setScore={setScore}
+            score={score} setScore={setScore} errorTestCase={errorTestCase}
+            timeleft={timeleft} setproblemscore={setproblemscore}  problemScore={problemScore}
             />)}
     </div>
   )
 }
 
-export default ContestRound
+export default ContestRound;
+
+
+
+    // const runAgainFx = async () => {
+    //     try {
+    //         await handleSubmit();
+    //     } catch (error) {
+    //         console.log(error);
+    //     }
+    // }
+
+            // if(resp?.status===300){
+            //     return alert(resp.message)
+            // }
+            // if (resp?.result.run.signal === "SIGKILL" && retryCount < maxRetries) {
+            //     retryCount++;
+            //     await runAgainFx();
+            // } else if (retryCount >= maxRetries) {
+            //     alert("Try again after some time :( or try in different language");
+            //     retryCount = 0;
+            //     return;
+            // } else if (resp?.result.run.output!==undefined) {
+            //   setOutput(resp?.result.run.output);
+            // }
+            //  await checkTestCases();

@@ -13,8 +13,17 @@ interface TestcaseInterface {
   score:number,
   problemName:string;
   setScore:(n:number)=>void;
-  type:string
+  type:string,
+  errorTestCase:string,
+  timeleft?:number,
+  setproblemscore?: React.Dispatch<React.SetStateAction<ProblemScore[]>>,
+  problemScore?:ProblemScore[];
 }
+
+type ProblemScore = {
+  problem: string;
+  score: number;
+};
 
 function findScore(problemName:string,scoresArray:[]) {
   for (const obj of scoresArray) {
@@ -42,13 +51,12 @@ function deepEqual(a, b) {
       if (keysA.length !== keysB.length) return false;
       return keysA.every(key => deepEqual(a[key], b[key]));
   }
-
   return a === b;
 }
 
 
 
-const ShowTestCase = ({ output,testcase, testcaseans, problemName,setProblemssolved, problemssolved,setScore }: TestcaseInterface) => {
+const ShowTestCase = ({ output,testcase, testcaseans, problemName,setProblemssolved, problemssolved,setScore,errorTestCase,timeleft,setproblemscore,problemScore }: TestcaseInterface) => {
   const [passedTestCase, setPassedTestCase] = useState(0);
   const [totalTestCase, setTotalTestCase] = useState(0);
   const session = useSession();
@@ -60,12 +68,9 @@ const ShowTestCase = ({ output,testcase, testcaseans, problemName,setProblemssol
   
 
   const testcasesOutputgiven = testcaseans.filter((line:any) => line.trim() !== '').map((line:any) => line.trim().replace(/\r/g, '')); 
-  console.log("----------------------------")
+
   
-  // console.log("original OOUtpout",output,typeof output);
   let yourOutput = output.split("\n").filter((line:any)=>line!=="");
-  // console.log("givenOutput",testcasesOutputgiven);
-  // console.log("youroutput",yourOutput);
 
   if(yourOutput.length > testcasesOutputgiven.length){
     const concatenatedString = yourOutput.join('');
@@ -76,10 +81,10 @@ const ShowTestCase = ({ output,testcase, testcaseans, problemName,setProblemssol
   function compareLines() {
     let passedCount = 0;
     setTotalTestCase(testcase.length);
+    if(errorTestCase!=="")return;
     for (let index = 0; index < testcasesOutputgiven.length; index++) {
     const test = testcasesOutputgiven[index];
     const yourOutputValue = yourOutput[index];
-    console.log("test",test,"yourOutput",yourOutputValue)
       console.log(`${index}`,test.replace(/\s+/g, ''),yourOutput[index].replace(/\s+/g, ''))
       try {
 
@@ -117,12 +122,16 @@ const ShowTestCase = ({ output,testcase, testcaseans, problemName,setProblemssol
   }
 
   useEffect(() => {
+
     compareLines();
   }, [testcaseans]);
 
 
   useEffect(() => {
+    localStorage.setItem('problemScores', JSON.stringify(problemScore));
+}, [problemScore]);
 
+  useEffect(() => {
     if (setScore && setProblemssolved) {
       const localStorageScore = localStorage.getItem("contest-scores");
       const parsedScore = localStorageScore? JSON.parse(localStorageScore):null;
@@ -135,7 +144,22 @@ const ShowTestCase = ({ output,testcase, testcaseans, problemName,setProblemssol
         //@ts-ignore
         setProblemssolved( problemssolved + 1); // Increment problemssolved by 1
         //@ts-ignore
-        setScore(percentPassed); // Increment score based on percent passed
+        setScore(percentPassed + (timeleft ? (timeleft/500):0)); 
+        if (setproblemscore && problemScore) {
+          setproblemscore((prevScores) => {
+            return prevScores.map((problem) => {
+              const current_score = Math.round(Math.max(problem.score, Math.round(percentPassed + (timeleft ? (timeleft/500):0))))
+
+              
+              if (problem.problem === problemName) {
+                // Update the score if the new score is higher
+                return { ...problem, score: current_score };
+              }
+              return problem; // Return unchanged problem score
+            });
+          });
+          // localStorage.setItem("score",JSON.stringify(problemScore))
+        }
       }
     }
   },  [passedTestCase, totalTestCase, setProblemssolved, setScore]);
@@ -144,7 +168,6 @@ const ShowTestCase = ({ output,testcase, testcaseans, problemName,setProblemssol
     <div className="flex items-center justify-center min-h-[50%] bg-white p-4 text-white">
       
   <div className="w-full max-w-4xl bg-black shadow-md rounded-md p-4 flex flex-col lg:flex-row">
-  <p>{problemssolved}</p>
     <div className="flex-grow lg:mr-8 mb-4 lg:mb-0">
       <div className="mb-4">
         <div className="font-bold">Time:</div>
@@ -183,9 +206,11 @@ const ShowTestCase = ({ output,testcase, testcaseans, problemName,setProblemssol
           </div>
           <div className="mb-4">
             <div className="font-bold">Your Output:</div>
-                  <div className="bg-gray-800 p-4 rounded-md"> {yourOutput && yourOutput[passedTestCase] && yourOutput[passedTestCase].length < 450
-          ? yourOutput[passedTestCase]
-          : ""}</div>
+                  {errorTestCase===""?(
+                    <div className="bg-gray-800 p-4 rounded-md"> {yourOutput && yourOutput[passedTestCase] }</div>
+                  ):(
+                  <div className="bg-gray-800 p-4 rounded-md"> {errorTestCase}</div>
+                  )}
           </div>
         </>
       ) : (

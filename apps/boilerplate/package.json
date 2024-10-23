@@ -6,7 +6,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "nodemon ./src/index.ts && ts-node ./src/index.ts ",
-    "seed" : "node ./dist/seed.js"
+    "seed" : "node ./dist/seed.js",
+    "seed-contest":"node ./dist/seedContest.js"
   },
   "keywords": [],
   "author": "",

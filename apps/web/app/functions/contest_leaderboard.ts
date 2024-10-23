@@ -2,11 +2,13 @@
 
 import axios from "axios";
 import BACKEND_URL from "./backendurl";
+import { address } from "ip";
 
 async function leaderboard_user(contest:string,userid:string){
     console.log("))))))))))", contest,userid)
     try {
-        const resp = await axios.post(`${BACKEND_URL}/contest/${contest}/data`,{userId:userid});
+        const ipAddress = `http://${address()}:4000`;
+      const resp = await axios.post(`${ipAddress}/leaderboard/contest/${contest}/data`,{userId:userid});
         console.log(`${BACKEND_URL}/${contest}/data`);
         const data = resp.data;
         console.log("DATA L ---------------- ",data)

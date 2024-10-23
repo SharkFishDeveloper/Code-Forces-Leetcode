@@ -6,7 +6,8 @@
     "dev": "turbo dev",
     "lint": "turbo lint",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
-    "seed":"cd apps/boilerplate && node ./dist/seed.js"
+    "seed":"cd apps/boilerplate && node ./dist/seed.js",
+    "seed-contest":"cd apps/boilerplate && node ./dist/seedContest.js"
   },
   "devDependencies": {
     "prettier": "^3.2.5",

@@ -7,8 +7,9 @@ export async function GET() {
         const cacheKey = `problems-contest-1`;
         let cachedData = await getAsync(cacheKey);
 
-        if(cachedData){
-            console.log("CONTEST HIT",JSON.parse(cachedData))
+        if(cachedData!==null){
+            console.log("CDATA",cachedData)
+            console.log("CONTEST HIT",cachedData ? JSON.parse(cachedData):"")
             const parsedData = cachedData ?  JSON.parse(cachedData):null;
             return NextResponse.json({resp:parsedData},{status:200})
         }
@@ -26,6 +27,6 @@ export async function GET() {
     } catch (error) {
         return NextResponse.json({message:error},{status:504});
     }finally{
-        // await prisma.$disconnect()
+        await prisma.$disconnect()
     }
 }

@@ -1,0 +1,18 @@
+{
+  "contests": [
+    {
+      "name": "990A",
+      "problemsId": [
+        "binarysearch",
+        "divide",
+        "add"
+      ],
+      "score": [
+        "200",
+        "100",
+        "50"
+      ],
+      "startTime": "2024-10-24T20:00:00.000Z"
+    }
+  ]
+}

@@ -6,6 +6,7 @@ import fs from 'fs';
 async function main() {
   // Read the exported data
   const data = JSON.parse(fs.readFileSync('exportedData.json', 'utf-8'));
+  
 
   for (const problem of data.problems) {
     try {

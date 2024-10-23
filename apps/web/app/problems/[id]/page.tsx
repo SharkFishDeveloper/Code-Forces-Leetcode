@@ -9,11 +9,9 @@ import ShowTestCase from '../../../components/ShowTestCase';
 import Submissions from '../../../components/Submissions';
 import axios from 'axios';
 import FRONTEND_URL from '../../functions/frontendurl';
-
+import ip from "ip"
 
 const Problem = ({ params }: { params: { id: string, title: string, path: string, level: string } }) => {
-    let retryCount = 1;
-    const maxRetries = 2;
     const [code, setCode] = useState<string>("");
     const [selectedLanguage, setSelectedLanguage] = useState<string>("C++");
     const [loading, setLoading] = useState(false);
@@ -26,6 +24,7 @@ const Problem = ({ params }: { params: { id: string, title: string, path: string
     const scrollRef = useRef<HTMLDivElement>(null);
     const [submission,showSubmission] = useState(false);
     const [submitButton,showSubmitButton] = useState(true);
+    const [errorTestCase,setErrorTestCase] = useState("");
 
     const findMd = async()=>{
         try {
@@ -106,18 +105,12 @@ const Problem = ({ params }: { params: { id: string, title: string, path: string
              fetchBoilerPlate();
        },[selectedLanguage])
 
-    
-    
-    const runAgainFx = async () => {
-        try {
-            await handleSubmit();
-        } catch (error) {
-            console.log(error);
-        }
-    }
 
+    //    console.log("****",ip.address('ipv4'))
     const handleSubmit = async () => {
-        console.log("SUBMIT IN LANGUAGE=>",selectedLanguage);
+      
+        
+        setErrorTestCase("");
         setShowtestcase(false);
         let final_user_code="";
         if(selectedLanguage==="Java"){
@@ -135,21 +128,15 @@ const Problem = ({ params }: { params: { id: string, title: string, path: string
         setLoading(true);
         try {
             const Language = selectedLanguage.toLowerCase();
-            console.log("language->",selectedLanguage);
             const resp = await Submit({ selectedLanguage: Language, code: final_user_code });
             if(resp?.status===300){
                 return alert(resp.message)
             }
-            // if (resp?.result.run.signal === "SIGKILL" && retryCount < maxRetries) {
-            //     retryCount++;
-            //     await runAgainFx();
-            // } else if (retryCount >= maxRetries) {
-            //     alert("Try again after some time :( or try in different language");
-            //     retryCount = 0;
-            //     return;
-            // } else 
-            if (resp?.result.run.output!==undefined) {
-              setOutput(resp?.result.run.output);
+            if (resp?.status===403) {
+              setErrorTestCase(resp?.result);
+            }
+            else if (resp?.status===200) {
+              setOutput(resp?.result);
             }
              await checkTestCases();
         } catch (error) {
@@ -200,14 +187,32 @@ const Problem = ({ params }: { params: { id: string, title: string, path: string
         </div>
         {showtestcase && (
              //@ts-ignore
-            <ShowTestCase output={output} testcaseans={testcaseans} testcase={testcase} problemName={params.id} type="PROBLEM" />)}
+            <ShowTestCase output={output} testcaseans={testcaseans} testcase={testcase} problemName={params.id} type="PROBLEM" errorTestCase={errorTestCase}/>)}
         </div>
     );
 }
 
 export default Problem;
 
+            
+    
+    
+    // const runAgainFx = async () => {
+    //     try {
+    //         await handleSubmit();
+    //     } catch (error) {
+    //         console.log(error);
+    //     }
+    // }
 
+            // if (resp?.result.run.signal === "SIGKILL" && retryCount < maxRetries) {
+            //     retryCount++;
+            //     await runAgainFx();
+            // } else if (retryCount >= maxRetries) {
+            //     alert("Try again after some time :( or try in different language");
+            //     retryCount = 0;
+            //     return;
+            // } else 
 
     // useEffect(() => {
     //     const saveCode = () => {
