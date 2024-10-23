@@ -6,8 +6,9 @@
     "dev": "turbo dev",
     "lint": "turbo lint",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
-    "seed":"cd apps/boilerplate && node ./dist/seed.js",
-    "seed-contest":"cd apps/boilerplate && node ./dist/seedContest.js"
+    "seed": "cd apps/boilerplate && node ./dist/seed.js",
+    "seed-contest": "cd apps/boilerplate && node ./dist/seedContest.js",
+     "dev:nodemon": "cd apps/web && nodemon --watch pages --watch components --watch public --watch styles --exec next dev"
   },
   "devDependencies": {
     "prettier": "^3.2.5",
@@ -25,6 +26,7 @@
   "dependencies": {
     "@prisma/client": "^5.16.1",
     "next-auth": "^4.24.7",
+    "nodemon": "^3.1.7",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "tls": "^0.0.1"
