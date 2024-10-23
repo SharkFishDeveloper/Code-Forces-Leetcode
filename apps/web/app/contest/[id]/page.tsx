@@ -302,14 +302,14 @@ async function onFinishTimer (){
 
   return (
     <div className="">
-         <div className=" text-center">
+         {/* <div className=" text-center">
       Score - {score }
       problemName - {problemTitle}
-      time - {timeleft}
+      time - {timeleft} */}
       <div>
-        MAP - {JSON.stringify(problemScore)}
-      </div>
-    <p>{localStorage.getItem('contest-score')}</p>
+        {/* MAP - {JSON.stringify(problemScore)} */}
+      {/* </div> */}
+    {/* <p>{localStorage.getItem('contest-score')}</p> */}
         <div className="text-lg font-bold flex justify-between p-3">
         <p className="font-bold text-2xl">Round - {params.id}</p>
 
